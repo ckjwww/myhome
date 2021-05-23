@@ -10,7 +10,9 @@ import java.util.List;
 @Mapper
 public interface contentMapper {
 
-    List<contentDTO> retrieveContent();
+    List<contentDTO> retrieveContents();
+
+    contentDTO retrieveContent(int id);
 
     int insertContent(contentDTO contentdto);
 }

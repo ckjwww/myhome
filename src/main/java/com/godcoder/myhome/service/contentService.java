@@ -13,9 +13,16 @@ public class contentService {
     @Autowired
     contentMapper contentmapper;
 
-    public List<contentDTO> retrieveContent(){
+    public List<contentDTO> retrieveContents(){
 
-        List<contentDTO> contentdto = contentmapper.retrieveContent();
+        List<contentDTO> contentdto = contentmapper.retrieveContents();
+
+        return contentdto;
+    }
+
+    public contentDTO retrieveContent(int id){
+
+        contentDTO contentdto = contentmapper.retrieveContent(id);
 
         return contentdto;
     }

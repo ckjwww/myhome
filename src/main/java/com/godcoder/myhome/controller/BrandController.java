@@ -4,10 +4,7 @@ import com.godcoder.myhome.entity.contentDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import com.godcoder.myhome.service.contentService;
 
 import java.util.List;
@@ -21,14 +18,19 @@ public class BrandController {
 
     @GetMapping("/list")
     public String list(Model model){
-        List<contentDTO> contentdto =  contentservice.retrieveContent();
+        List<contentDTO> contentdto =  contentservice.retrieveContents();
         model.addAttribute("board", contentdto);
         return "board/list";
     }
 
     @GetMapping("/form")
-    public String form(Model model) {
-        model.addAttribute("board", new contentDTO());
+    public String form(Model model, @RequestParam(required = false) Integer id) {
+        if (id == null) {
+            model.addAttribute("board", new contentDTO());
+        } else {
+            contentDTO contentdto =  contentservice.retrieveContent(id);
+            model.addAttribute("board", contentdto);
+        }
         return "board/form";
     }
 
