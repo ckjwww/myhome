@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 컨텐츠 --><!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.godcoder.myhome.mapper.contentMapper">
+    <!--    <select id="retrieveContent" parameterType="kr.amc.amis.share.entity.im.uc.rm.ReqBasicDTO" resultType="kr.amc.amis.share.entity.im.uc.rm.ReqBasicDTO"> -->
+    <select id="retrieveContent" resultType="com.godcoder.myhome.entity.contentDTO">
+        <![CDATA[
+            SELECT /* SQLID=com.godcoder.myhome.mapper.contentMapper.retrieveContent */
+                   id
+                 , title
+                 , content
+              FROM board
+        ]]>
+    </select>
+</mapper>
