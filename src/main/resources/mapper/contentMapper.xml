@@ -11,4 +11,11 @@
               FROM board
         ]]>
     </select>
+
+    <insert id="insertContent" parameterType="com.godcoder.myhome.entity.contentDTO">
+        <![CDATA[
+            INSERT INTO board (id, title, content)
+                       VALUES (#{id}, #{title}, #{content})
+        ]]>
+    </insert>
 </mapper>

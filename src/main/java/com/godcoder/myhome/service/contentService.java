@@ -5,16 +5,25 @@ import com.godcoder.myhome.mapper.contentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class contentService {
 
     @Autowired
     contentMapper contentmapper;
 
-    public contentDTO retrieveContent(){
+    public List<contentDTO> retrieveContent(){
 
-        contentDTO contentdto = contentmapper.retrieveContent();
+        List<contentDTO> contentdto = contentmapper.retrieveContent();
 
         return contentdto;
+    }
+
+    public int insertContent(contentDTO contentdto) {
+
+        int inCnt = contentmapper.insertContent(contentdto);
+
+        return inCnt;
     }
 }
