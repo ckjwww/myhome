@@ -31,23 +31,34 @@ public class BrandController implements WebMvcConfigurer {
     }
 
     @GetMapping("/form")
-    public String form(@ModelAttribute("contentdto") contentDTO contentdto, @RequestParam(required = false) Integer id) {
-        if (id == null) {
-            contentdto = new contentDTO();
-        } else {
-            contentdto =  contentservice.retrieveContent(id);
+    public String form(Model model
+            , @RequestParam(required = false) Integer id
+            , @RequestParam(required = false) String flag) {
+
+        if (flag == null) {
+            contentDTO contentdto = null;
+            if (id == null) {
+                contentdto = new contentDTO();
+            } else {
+                contentdto = contentservice.retrieveContent(id);
+            }
+            model.addAttribute("contentdto", contentdto);
+
+            return "board/form";
         }
-        return "board/form";
+        else {
+            int inCnt = contentservice.deleteContent(id);
+
+            return "redirect:/board/list";
+        }
     }
-//    public String form(Model model, @RequestParam(required = false) Integer id) {
-//        if (id == null) {
-//            model.addAttribute("board", new contentDTO());
-//        } else {
-//            contentDTO contentdto =  contentservice.retrieveContent(id);
-//            model.addAttribute("board", contentdto);
-//        }
-//        return "board/form";
-//    }
+
+    @PostMapping("/delete")
+    public String delete(contentDTO contentdto) {
+
+        int inCnt = contentservice.deleteContent(contentdto.getId());
+        return "redirect:/board/list";
+    }
 
     @PostMapping("/form")
     //public String form(@ModelAttribute contentDTO contentdto) {

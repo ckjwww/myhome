@@ -29,4 +29,12 @@
                        VALUES (#{id}, #{title}, #{content})
         ]]>
     </insert>
+
+    <delete id="deleteContent" parameterType="Integer">
+        <![CDATA[
+            DELETE /* SQLID=com.godcoder.myhome.mapper.contentMapper.deleteContent */
+              FROM board
+             WHERE id = #{num}
+        ]]>
+    </delete>
 </mapper>

@@ -15,4 +15,6 @@ public interface contentMapper {
     contentDTO retrieveContent(int id);
 
     int insertContent(contentDTO contentdto);
+
+    int deleteContent(int id);
 }

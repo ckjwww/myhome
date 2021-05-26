@@ -33,4 +33,12 @@ public class contentService {
 
         return inCnt;
     }
+
+    //컨텐츠 삭제
+    public int deleteContent(int id){
+
+        int inCnt = contentmapper.deleteContent(id);
+
+        return inCnt;
+    }
 }
