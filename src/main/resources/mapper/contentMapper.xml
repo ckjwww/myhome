@@ -2,13 +2,15 @@
 <!-- 컨텐츠 --><!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.godcoder.myhome.mapper.contentMapper">
     <!--    <select id="retrieveContent" parameterType="kr.amc.amis.share.entity.im.uc.rm.ReqBasicDTO" resultType="kr.amc.amis.share.entity.im.uc.rm.ReqBasicDTO"> -->
-    <select id="retrieveContents" resultType="com.godcoder.myhome.entity.contentDTO">
+    <select id="retrieveContents" parameterType="hashMap" resultType="com.godcoder.myhome.entity.contentDTO">
         <![CDATA[
             SELECT /* SQLID=com.godcoder.myhome.mapper.contentMapper.retrieveContent */
                    id
                  , title
                  , content
               FROM board
+          ORDER BY id
+             LIMIT #{searchDataIdx}, #{pageDataCnt}
         ]]>
     </select>
 
@@ -37,4 +39,13 @@
              WHERE id = #{num}
         ]]>
     </delete>
+
+    <select id="getContentCnt" resultType="Integer">
+        <![CDATA[
+            SELECT /* SQLID=com.godcoder.myhome.mapper.contentMapper.getContentCnt */
+                   COUNT(content) CONTENT_TOT_CNT
+              FROM board
+        ]]>
+    </select>
+
 </mapper>
