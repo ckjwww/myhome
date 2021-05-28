@@ -25,6 +25,7 @@ public class BrandController implements WebMvcConfigurer {
     @Autowired
     BoardValidator boardvalidator;
 
+    @SuppressWarnings({"unchecked", "unused", "RedundantSuppression"})
     @GetMapping("/list")
     public String list(Model model
                     , @RequestParam(required = false) Integer pageNo
@@ -34,7 +35,6 @@ public class BrandController implements WebMvcConfigurer {
         int pageDataCnt = 2;
 
         if (pageNo == null) {
-            searchDataIdx = 0;
             pageNo = 1;
         } else {
             searchDataIdx = (pageNo - 1) * pageDataCnt;
@@ -42,7 +42,7 @@ public class BrandController implements WebMvcConfigurer {
         if (searchVal == null) {
             searchVal = "";
         }
-        Map map = new HashMap();
+        Map<String, Object> map = new HashMap<>();
         map.put("searchDataIdx", searchDataIdx);
         map.put("pageDataCnt", pageDataCnt);
         map.put("searchVal", searchVal);
@@ -50,8 +50,8 @@ public class BrandController implements WebMvcConfigurer {
         int iContentTotCnt = contentservice.getContentCnt(map);
         int iPageCnt = (iContentTotCnt / pageDataCnt) + ((iContentTotCnt % pageDataCnt) > 0 ? 1 : 0);
 
-        List<contentDTO> contentdto =  contentservice.retrieveContents(map);
-        model.addAttribute("board", contentdto);
+        List<contentDTO> contentDto =  contentservice.retrieveContents(map);
+        model.addAttribute("board", contentDto);
         model.addAttribute("pageCnt", iPageCnt);
         model.addAttribute("curPageNo", pageNo);
         model.addAttribute("searchVal", searchVal);
@@ -59,62 +59,65 @@ public class BrandController implements WebMvcConfigurer {
         return "board/list";
     }
 
+    @SuppressWarnings({"unchecked", "unused", "RedundantSuppression"})
     @GetMapping("/form")
     public String form(Model model
             , @RequestParam(required = false) Integer id
             , @RequestParam(required = false) String flag) {
 
         if (flag == null) {
-            contentDTO contentdto = null;
-            if (id == null) {
-                contentdto = new contentDTO();
-            } else {
-                contentdto = contentservice.retrieveContent(id);
+            contentDTO contentDto = new contentDTO();
+            if (id != null) {
+                contentDto = contentservice.retrieveContent(id);
             }
-            model.addAttribute("contentdto", contentdto);
+            model.addAttribute("contentDto", contentDto);
 
             return "board/form";
         }
         else {
-            int inCnt = contentservice.deleteContent(id);
+            contentservice.deleteContent(id);
 
             return "redirect:/board/list";
         }
     }
 
+    @SuppressWarnings({"unchecked", "unused", "RedundantSuppression"})
     @PostMapping("/delete")
-    public String delete(contentDTO contentdto) {
+    public String delete(contentDTO contentDto) {
 
-        int inCnt = contentservice.deleteContent(contentdto.getId());
+        contentservice.deleteContent(contentDto.getId());
         return "redirect:/board/list";
     }
 
+    @SuppressWarnings({"unchecked", "unused", "RedundantSuppression"})
     @PostMapping("/form")
-    //public String form(@ModelAttribute contentDTO contentdto) {
-    public String form(@Valid @ModelAttribute("contentdto") contentDTO contentdto, BindingResult bindingResult) {
-    //public String form(@Valid contentDTO contentdto, BindingResult bindingResult) {
-        //boardvalidator.validate(contentdto, bindingResult);
+    //public String form(@ModelAttribute contentDTO contentDto) {
+    public String form(@Valid @ModelAttribute("contentDto") contentDTO contentDto, BindingResult bindingResult) {
+    //public String form(@Valid contentDTO contentDto, BindingResult bindingResult) {
+        boardvalidator.validate(contentDto, bindingResult);
 
         if (bindingResult.hasErrors()) {
             return "board/form";
         }
 
-        int inCnt = contentservice.insertContent(contentdto);
+        contentservice.insertContent(contentDto);
         return "redirect:/board/list";
     }
 
+    @SuppressWarnings({"unchecked", "unused", "RedundantSuppression"})
     @GetMapping("/test")
-    public String form(@ModelAttribute("contentdto") contentDTO contentdto) {
-        //model.addAttribute("contentdto", new contentDTO());
+    public String form(@ModelAttribute("contentDto") contentDTO contentdto) {
+        //model.addAttribute("contentDto", new contentDTO());
         return "board/test";
     }
 
+    @SuppressWarnings({"unchecked", "unused", "RedundantSuppression"})
     @PostMapping("/test")
-    public String test(@Valid @ModelAttribute("contentdto") contentDTO contentdto, BindingResult bindingResult) {
+    public String test(@Valid @ModelAttribute("contentDto") contentDTO contentdto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "board/test";
         }
-        int inCnt = contentservice.insertContent(contentdto);
+        contentservice.insertContent(contentdto);
         return "redirect:/board/list";
     }
 }
