@@ -26,12 +26,12 @@ public class BrandController implements WebMvcConfigurer {
     BoardValidator boardvalidator;
 
     @GetMapping("/list")
-    public String list(Model model, @RequestParam(required = false) Integer pageNo){
+    public String list(Model model
+                    , @RequestParam(required = false) Integer pageNo
+                    , @RequestParam(required = false) String searchVal){
 
-        int pageDataCnt = 2;
         int searchDataIdx = 0;
-        int iContentTotCnt = contentservice.getContentCnt();
-        int iPageCnt = (iContentTotCnt / pageDataCnt) + ((iContentTotCnt % pageDataCnt) > 0 ? 1 : 0);
+        int pageDataCnt = 2;
 
         if (pageNo == null) {
             searchDataIdx = 0;
@@ -39,14 +39,22 @@ public class BrandController implements WebMvcConfigurer {
         } else {
             searchDataIdx = (pageNo - 1) * pageDataCnt;
         }
+        if (searchVal == null) {
+            searchVal = "";
+        }
         Map map = new HashMap();
         map.put("searchDataIdx", searchDataIdx);
         map.put("pageDataCnt", pageDataCnt);
+        map.put("searchVal", searchVal);
+
+        int iContentTotCnt = contentservice.getContentCnt(map);
+        int iPageCnt = (iContentTotCnt / pageDataCnt) + ((iContentTotCnt % pageDataCnt) > 0 ? 1 : 0);
 
         List<contentDTO> contentdto =  contentservice.retrieveContents(map);
         model.addAttribute("board", contentdto);
         model.addAttribute("pageCnt", iPageCnt);
         model.addAttribute("curPageNo", pageNo);
+        model.addAttribute("searchVal", searchVal);
 
         return "board/list";
     }

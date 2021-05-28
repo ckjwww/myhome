@@ -9,6 +9,8 @@
                  , title
                  , content
               FROM board
+             WHERE title LIKE CONCAT('%', #{searchVal}, '%')
+                OR content LIKE CONCAT('%', #{searchVal}, '%')
           ORDER BY id
              LIMIT #{searchDataIdx}, #{pageDataCnt}
         ]]>
@@ -40,11 +42,13 @@
         ]]>
     </delete>
 
-    <select id="getContentCnt" resultType="Integer">
+    <select id="getContentCnt" parameterType="hashMap" resultType="Integer">
         <![CDATA[
             SELECT /* SQLID=com.godcoder.myhome.mapper.contentMapper.getContentCnt */
                    COUNT(content) CONTENT_TOT_CNT
               FROM board
+             WHERE title LIKE CONCAT('%', #{searchVal}, '%')
+                OR content LIKE CONCAT('%', #{searchVal}, '%')
         ]]>
     </select>
 

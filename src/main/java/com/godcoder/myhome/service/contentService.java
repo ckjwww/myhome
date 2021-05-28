@@ -45,9 +45,9 @@ public class contentService {
     }
 
     //컨텐츠 전체건수
-    public int getContentCnt(){
+    public int getContentCnt(Map map){
 
-        int iContentCnt = contentmapper.getContentCnt();
+        int iContentCnt = contentmapper.getContentCnt(map);
 
         return iContentCnt;
     }    

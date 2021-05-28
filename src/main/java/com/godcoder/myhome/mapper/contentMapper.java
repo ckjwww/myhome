@@ -20,5 +20,5 @@ public interface contentMapper {
 
     int deleteContent(int id);
 
-    int getContentCnt();
+    int getContentCnt(Map map);
 }
