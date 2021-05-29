@@ -26,8 +26,11 @@
                 <a class="nav-link" th:classappend="${menu}=='index' ? 'active'" aria-current="page" href="#" th:href="@{/}">홈</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" th:classappend="${menu}=='list' ? 'active'" href="#" th:href="@{board/list}">게시판</a>
+                <a class="nav-link" th:classappend="${menu}=='list' ? 'active'" href="#" th:href="@{../board/list}">게시판</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${menu}=='listPositon' ? 'active'" href="#" th:href="@{../baseball/listPosition}">BaseBall</a>
+                    </li>                                
                 <li class="nav-item">
                     <a class="nav-link" th:classappend="${menu}=='list' ? 'active'" href="#" th:href="@{board/test}">valid</a>
                     </li>                

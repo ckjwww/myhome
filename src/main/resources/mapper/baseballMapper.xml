@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.godcoder.myhome.mapper.baseballMapper">
+    <select id="retrieveBaseball" resultType="com.godcoder.myhome.entity.baseballDTO">
+        <![CDATA[
+            SELECT
+                   A.DROP_DOWN dropDownCd, B.IN_NM dropDownNm
+              FROM BASEBALL A, COMMON_CODE B
+             WHERE A.DROP_DOWN = B.IN_CD
+               AND B.KND_CD = '01'
+          ORDER BY A.DROP_DOWN
+        ]]>
+    </select>
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.godcoder.myhome.mapper.codeMapper">
+    <select id="retrieveCode" parameterType="String" resultType="com.godcoder.myhome.entity.codeDTO">
+        <![CDATA[
+            SELECT /* SQLID=com.godcoder.myhome.mapper.baseballMapper.retrieveBaseball */
+                   KND_CD kndCd
+                 , KND_NM kndNm
+                 , IN_CD inCd
+                 , IN_NM inNm
+              FROM common_code
+          ORDER BY IN_CD
+        ]]>
+    </select>
+</mapper>
