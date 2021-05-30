@@ -4,11 +4,62 @@
     <select id="retrieveBaseball" resultType="com.godcoder.myhome.entity.baseballDTO">
         <![CDATA[
             SELECT
-                   A.DROP_DOWN dropDownCd, B.IN_NM dropDownNm
+                   A.MANAGE_ID manageId
+                 , A.DROP_DOWN dropDownCd
+                 , B.IN_NM dropDownNm
               FROM BASEBALL A, COMMON_CODE B
              WHERE A.DROP_DOWN = B.IN_CD
                AND B.KND_CD = '01'
           ORDER BY A.DROP_DOWN
         ]]>
     </select>
+
+    <insert id="insertBaseball" parameterType="com.godcoder.myhome.entity.baseballDTO">
+        <selectKey keyProperty="makeId" resultType="String" order="BEFORE">
+            SELECT SELECT LPAD(CAST(IFNULL(MAX(MANAGE_ID), '0') AS INTEGER) + 1, 4, 0)
+            FROM baseball
+        </selectKey>
+        /* mariadb */
+        <![CDATA[
+        INSERT INTO baseball (manage_id, drop_down)
+                      VALUES (#{makeId}, #{dropDown})
+        ]]>
+    </insert>
+
+    <update id="updateBaseball" parameterType="com.godcoder.myhome.entity.baseballDTO">
+        /* mariadb */
+        <![CDATA[
+        UPDATE baseball
+           SET drop_down = #{dropDown}
+         WHERE MANAGE_ID = #{manageId}
+        ]]>
+
+        <!-- mariadb
+        INSERT INTO baseball (manage_id, drop_down)
+                      VALUES (#{makeId}, #{DROP_DOWN})
+        ON DUPLICATE KEY UPDATE
+            drop_down = #{DROP_DOWN}
+        -->
+        <!-- ORACLE
+        MERGE INTO baseball	M
+        USING (
+            SELECT
+                   #{makeId}    MAKE_ID
+                 , #{manageId}	MANAGE_ID
+                 , #{DROP_DOWN} DROP_DOWN
+            ) S
+        ON (M.MANAGE_ID = S.MANAGE_ID)
+        WHEN MATCHED THEN
+        UPDATE SET
+            M.DROP_DOWN    = S.DROP_DOWN
+        WHEN NOT MATCHED THEN
+            INSERT (
+                   MANAGE_ID
+                 , DROP_DOWN
+            )
+            VALUES (
+                  S.MAKE_ID
+                , S.DROP_DOWN
+            ); -->
+    </update>
 </mapper>

@@ -20,4 +20,18 @@ public class baseballService {
 
         return baseballDto;
     }
+
+    public int insertBaseball(baseballDTO baseballDto){
+
+        int rtnCnt = baseballmapper.insertBaseball(baseballDto);
+
+        return rtnCnt;
+    }
+
+    public int updateBaseball(baseballDTO baseballDto){
+
+        int rtnCnt = baseballmapper.updateBaseball(baseballDto);
+
+        return rtnCnt;
+    }
 }

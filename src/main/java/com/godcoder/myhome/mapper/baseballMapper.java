@@ -9,4 +9,8 @@ import org.springframework.stereotype.Repository;
 public interface baseballMapper {
 
     baseballDTO retrieveBaseball();
+
+    int insertBaseball(baseballDTO baseballDto);
+
+    int updateBaseball(baseballDTO baseballDto);
 }

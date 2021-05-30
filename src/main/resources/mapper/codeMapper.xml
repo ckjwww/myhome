@@ -9,6 +9,7 @@
                  , IN_CD inCd
                  , IN_NM inNm
               FROM common_code
+             WHERE #{value}
           ORDER BY IN_CD
         ]]>
     </select>
