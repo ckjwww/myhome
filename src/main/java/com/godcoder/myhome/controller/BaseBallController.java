@@ -18,6 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.validation.Valid;
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
 
 @Controller
@@ -30,7 +31,7 @@ public class BaseBallController  implements WebMvcConfigurer {
     @Autowired
     codeService codeservice;
 
-    @GetMapping("/listPosition")
+    @GetMapping("/listposition")
     public String listPosition(Model model) {
 
         baseballDTO baseballDto = baseballservice.retrieveBaseball();
@@ -39,18 +40,24 @@ public class BaseBallController  implements WebMvcConfigurer {
         model.addAttribute("baseball", baseballDto);
         model.addAttribute("pos", codeDto);
 
-        return "baseball/listPosition";
+        return "baseball/listposition";
     }
 
-    @PostMapping("/listPosition")
-    public String listPosition(@Valid @ModelAttribute("baseballDto") baseballDTO baseballDto) {
+    @PostMapping("/listposition")
+    public String listPosition(@Valid @ModelAttribute("baseballDto") baseballDTO baseballDto, Model model) {
 
-        if (baseballDto.getManageId() == null) {
-            baseballservice.insertBaseball(baseballDto);
+        if (baseballDto.getManageId().isEmpty()) {
+            HashMap hashValue = baseballservice.insertBaseball(baseballDto);
+            baseballDto.setManageId(hashValue.get("manageId").toString());
         } else {
             baseballservice.updateBaseball(baseballDto);
         }
 
-        return "redirect:/baseball/listPosition";
+        List<codeDTO> codeDto = codeservice.retrieveCode("01");
+
+        model.addAttribute("baseball", baseballDto);
+        model.addAttribute("pos", codeDto);
+
+        return "redirect:/baseball/listposition";
     }
 }

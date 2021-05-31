@@ -10,4 +10,5 @@ public class baseballDTO {
     private String manageId;
     private String dropDownCd;
     private String dropDownNm;
+    private String makeId;
 }

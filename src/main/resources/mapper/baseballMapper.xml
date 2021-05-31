@@ -16,13 +16,13 @@
 
     <insert id="insertBaseball" parameterType="com.godcoder.myhome.entity.baseballDTO">
         <selectKey keyProperty="makeId" resultType="String" order="BEFORE">
-            SELECT SELECT LPAD(CAST(IFNULL(MAX(MANAGE_ID), '0') AS INTEGER) + 1, 4, 0)
+            SELECT LPAD(CAST(IFNULL(MAX(MANAGE_ID), '0') AS INTEGER) + 1, 4, 0)
             FROM baseball
         </selectKey>
         /* mariadb */
         <![CDATA[
         INSERT INTO baseball (manage_id, drop_down)
-                      VALUES (#{makeId}, #{dropDown})
+                      VALUES (#{makeId}, #{dropDownCd})
         ]]>
     </insert>
 
@@ -30,7 +30,7 @@
         /* mariadb */
         <![CDATA[
         UPDATE baseball
-           SET drop_down = #{dropDown}
+           SET drop_down = #{dropDownCd}
          WHERE MANAGE_ID = #{manageId}
         ]]>
 

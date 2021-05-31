@@ -5,6 +5,7 @@ import com.godcoder.myhome.mapper.baseballMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,14 +19,22 @@ public class baseballService {
 
         baseballDTO baseballDto = baseballmapper.retrieveBaseball();
 
+        if (baseballDto == null) {
+            baseballDto = new baseballDTO();
+        }
+
         return baseballDto;
     }
 
-    public int insertBaseball(baseballDTO baseballDto){
+    public HashMap insertBaseball(baseballDTO baseballDto){
 
         int rtnCnt = baseballmapper.insertBaseball(baseballDto);
 
-        return rtnCnt;
+        HashMap rtnMap = new HashMap<String, Object>();
+        rtnMap.put("rtnCnt", rtnCnt);
+        rtnMap.put("manageId", baseballDto.getMakeId());
+
+        return rtnMap;
     }
 
     public int updateBaseball(baseballDTO baseballDto){
