@@ -7,6 +7,8 @@
                    A.MANAGE_ID manageId
                  , A.DROP_DOWN dropDownCd
                  , B.IN_NM dropDownNm
+                 , A.CHECK_BOX checkBox
+                 , A.RADIO_BUTTON radioButton
               FROM BASEBALL A, COMMON_CODE B
              WHERE A.DROP_DOWN = B.IN_CD
                AND B.KND_CD = '01'
@@ -21,8 +23,8 @@
         </selectKey>
         /* mariadb */
         <![CDATA[
-        INSERT INTO baseball (manage_id, drop_down)
-                      VALUES (#{makeId}, #{dropDownCd})
+        INSERT INTO baseball (manage_id, drop_down, CHECK_BOX, RADIO_BUTTON)
+                      VALUES (#{makeId}, #{dropDownCd}, #{checkBox}, #{radioButton})
         ]]>
     </insert>
 
@@ -31,6 +33,8 @@
         <![CDATA[
         UPDATE baseball
            SET drop_down = #{dropDownCd}
+             , CHECK_BOX = #{checkBox}
+             , RADIO_BUTTON = #{radioButton}
          WHERE MANAGE_ID = #{manageId}
         ]]>
 
