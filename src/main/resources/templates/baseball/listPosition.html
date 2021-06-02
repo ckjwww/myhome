@@ -31,6 +31,47 @@
                     </select>
                 </div>
             </div>
+            <div class="row mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" 
+                    th:checked="${checkBox eq 'Y' ? 'checked' : ''}" th:value="Y" th:field="*{checkBox}" id="chkeckBox">
+                    <label class="form-check-label" for="chkeckBox">
+                      Indeterminate checkbox
+                    </label>
+                  </div>
+            </div>
+            <div class="row mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="radioButton1" name="radioButton" th:value="P" 
+                            th:checked="${baseball.radioButton eq 'P' ? 'checked' : ''}" th:field="*{radioButton}">
+                    <label class="form-check-label" for="radioButton1">
+                      투수
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" id="radioButton2" name="radioButton" th:value="C" 
+                            th:checked="${baseball.radioButton eq 'C' ? 'checked' : ''}" th:field="*{radioButton}">
+                    <label class="form-check-label" for="radioButton2">
+                      포수
+                    </label>
+                  </div>
+            </div>
+            <div class="row mb-3">
+                <label class="form-check-label col-sm-1 text-end" for="textString">String</label>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control" id="textString" th:field="*{textString}" th:text="${textString}">
+                </div>
+                <label class="form-check-label col-sm-1 text-end" for="textInteger">Integer</label>
+                <div class="col-sm-2">
+                    <input type="number" class="form-control" id="textInteger" th:field="*{textInteger}" th:text="${textInteger}">
+                </div>
+                <label class="form-check-label col-sm-1 text-end" for="textDate">Date</label>
+                <div class="col-sm-2">
+                    <input type="date" class="form-control" id="textDate" th:field="*{textDate}" th:text="${#dates.format(textDate, 'yyyy-MM-dd')}">
+                </div>
+                <div class="col-sm-3">
+                </div>
+            </div>
             <div>
                 <button type="submit">저장</button>
             </div>

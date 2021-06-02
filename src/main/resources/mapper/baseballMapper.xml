@@ -9,6 +9,9 @@
                  , B.IN_NM dropDownNm
                  , A.CHECK_BOX checkBox
                  , A.RADIO_BUTTON radioButton
+                 , A.TEXT_STRING textString
+                 , A.TEXT_INTEGER textInteger
+                 , A.TEXT_DATE textDate
               FROM BASEBALL A, COMMON_CODE B
              WHERE A.DROP_DOWN = B.IN_CD
                AND B.KND_CD = '01'
@@ -23,8 +26,10 @@
         </selectKey>
         /* mariadb */
         <![CDATA[
-        INSERT INTO baseball (manage_id, drop_down, CHECK_BOX, RADIO_BUTTON)
-                      VALUES (#{makeId}, #{dropDownCd}, #{checkBox}, #{radioButton})
+        INSERT INTO baseball (manage_id, drop_down, CHECK_BOX, RADIO_BUTTON
+                            , TEXT_STRING, TEXT_INTEGER, TEXT_DATE)
+                      VALUES (#{makeId}, #{dropDownCd}, #{checkBox}, #{radioButton}
+                            , #{textString}, #{textInteger}, #{textDate})
         ]]>
     </insert>
 
@@ -35,6 +40,9 @@
            SET drop_down = #{dropDownCd}
              , CHECK_BOX = #{checkBox}
              , RADIO_BUTTON = #{radioButton}
+             , TEXT_STRING = #{textString}
+             , TEXT_INTEGER = #{textInteger}
+             , TEXT_DATE = #{textDate}
          WHERE MANAGE_ID = #{manageId}
         ]]>
 
