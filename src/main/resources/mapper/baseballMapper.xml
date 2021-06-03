@@ -12,10 +12,12 @@
                  , A.TEXT_STRING textString
                  , A.TEXT_INTEGER textInteger
                  , A.TEXT_DATE textDate
+                 , A.TYPE_DATETIME typeDateTime
               FROM BASEBALL A, COMMON_CODE B
              WHERE A.DROP_DOWN = B.IN_CD
                AND B.KND_CD = '01'
           ORDER BY A.DROP_DOWN
+          LIMIT 1
         ]]>
     </select>
 
@@ -27,9 +29,9 @@
         /* mariadb */
         <![CDATA[
         INSERT INTO baseball (manage_id, drop_down, CHECK_BOX, RADIO_BUTTON
-                            , TEXT_STRING, TEXT_INTEGER, TEXT_DATE)
+                            , TEXT_STRING, TEXT_INTEGER, TEXT_DATE, TYPE_DATETIME)
                       VALUES (#{makeId}, #{dropDownCd}, #{checkBox}, #{radioButton}
-                            , #{textString}, #{textInteger}, #{textDate})
+                            , #{textString}, #{textInteger}, #{textDate}, #{typeDateTime})
         ]]>
     </insert>
 
@@ -43,6 +45,7 @@
              , TEXT_STRING = #{textString}
              , TEXT_INTEGER = #{textInteger}
              , TEXT_DATE = #{textDate}
+             , TYPE_DATETIME = #{typeDateTime}
          WHERE MANAGE_ID = #{manageId}
         ]]>
 

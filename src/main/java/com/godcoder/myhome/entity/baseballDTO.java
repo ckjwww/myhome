@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.DateTimeException;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -21,6 +22,9 @@ public class baseballDTO {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date textDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime typeDateTime;
 
     private String makeId;
 }

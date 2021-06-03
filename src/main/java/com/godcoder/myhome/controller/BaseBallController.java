@@ -46,6 +46,10 @@ public class BaseBallController  implements WebMvcConfigurer {
     @PostMapping("/listposition")
     public String listPosition(@Valid @ModelAttribute("baseballDto") baseballDTO baseballDto, Model model) {
 
+        if (baseballDto.getCheckBox() == null) {
+            baseballDto.setCheckBox("N");
+        }
+
         if (baseballDto.getManageId().isEmpty()) {
             HashMap hashValue = baseballservice.insertBaseball(baseballDto);
             baseballDto.setManageId(hashValue.get("manageId").toString());
@@ -53,10 +57,10 @@ public class BaseBallController  implements WebMvcConfigurer {
             baseballservice.updateBaseball(baseballDto);
         }
 
-        List<codeDTO> codeDto = codeservice.retrieveCode("01");
+        //List<codeDTO> codeDto = codeservice.retrieveCode("01");
 
-        model.addAttribute("baseball", baseballDto);
-        model.addAttribute("pos", codeDto);
+        //model.addAttribute("baseball", baseballDto);
+        //model.addAttribute("pos", codeDto);
 
         return "redirect:/baseball/listposition";
     }
