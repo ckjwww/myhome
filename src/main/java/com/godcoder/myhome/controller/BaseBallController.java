@@ -66,7 +66,8 @@ public class BaseBallController  implements WebMvcConfigurer {
 
     @PostMapping("/deleteposition")
     public String listPosition(Model model
-                             , @RequestParam(required = false) String manageid) {
+                             , @RequestParam(required = false) String manageid
+                             , @RequestParam(required = false) String manageid1) {
 
         baseballservice.deleteBaseball(manageid);
 
