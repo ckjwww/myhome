@@ -21,6 +21,33 @@
         ]]>
     </select>
 
+    <select id="retrieveBaseballist" resultType="com.godcoder.myhome.entity.baseballDTO">
+        <![CDATA[
+            SELECT
+                   A.MANAGE_ID manageId
+                 , A.DROP_DOWN dropDownCd
+                 , B.IN_NM dropDownNm
+                 , A.CHECK_BOX checkBox
+                 , A.RADIO_BUTTON radioButton
+                 , A.TEXT_STRING textString
+                 , A.TEXT_INTEGER textInteger
+                 , A.TEXT_DATE textDate
+                 , A.TYPE_DATETIME typeDateTime
+              FROM BASEBALL A, COMMON_CODE B
+             WHERE A.DROP_DOWN = B.IN_CD
+               AND B.KND_CD = '01'
+          ORDER BY A.DROP_DOWN
+        ]]>
+    </select>
+
+    <delete id="deleteBaseball" parameterType="String">
+        <![CDATA[
+            DELETE /* SQLID=com.godcoder.myhome.mapper.contentMapper.deleteContent */
+              FROM baseball
+             WHERE MANAGE_ID = #{value}
+        ]]>
+    </delete>
+
     <insert id="insertBaseball" parameterType="com.godcoder.myhome.entity.baseballDTO">
         <selectKey keyProperty="makeId" resultType="String" order="BEFORE">
             SELECT LPAD(CAST(IFNULL(MAX(MANAGE_ID), '0') AS INTEGER) + 1, 4, 0)

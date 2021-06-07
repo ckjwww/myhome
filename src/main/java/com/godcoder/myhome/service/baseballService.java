@@ -26,6 +26,13 @@ public class baseballService {
         return baseballDto;
     }
 
+    public List<baseballDTO> retrieveBaseballist(){
+
+        List<baseballDTO> baseballDto = baseballmapper.retrieveBaseballist();
+
+        return baseballDto;
+    }
+
     public HashMap insertBaseball(baseballDTO baseballDto){
 
         int rtnCnt = baseballmapper.insertBaseball(baseballDto);
@@ -40,6 +47,13 @@ public class baseballService {
     public int updateBaseball(baseballDTO baseballDto){
 
         int rtnCnt = baseballmapper.updateBaseball(baseballDto);
+
+        return rtnCnt;
+    }
+
+    public int deleteBaseball(String manageId){
+
+        int rtnCnt = baseballmapper.deleteBaseball(manageId);
 
         return rtnCnt;
     }

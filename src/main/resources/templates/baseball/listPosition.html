@@ -80,7 +80,38 @@
             </div>
         </form>
     </div>
-    
+    <br>
+    <div class="container"> 
+        <table class="table caption-top">
+            <caption>List of users</caption>
+            <thead>
+              <tr>
+                <th scope="col">No.</th>
+                <th scope="col">DropDownNm</th>
+                <th scope="col">CheckBox</th>
+                <th scope="col">Radio Button</th>
+                <th scope="col">String</th>
+                <th scope="col">CRUD</th>
+              </tr>
+            </thead>
+            <tbody>
+              <th:black th:each="fval, num:${baseballist}">
+              <tr>
+                <th scope="row" th:text="${num.count}">1</th>
+                <td th:text="${fval.dropDownNm}">Mark</td>
+                <td th:text="${fval.checkBox}">checkBox</td>
+                <td th:text="${fval.radioButton}">radioButton</td>
+                <td th:text="${fval.textString}">textString</td>
+                <td>
+                    <a type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="">update</a>
+                    <a type="button" class="btn btn-primary" id="btnDelete" th:onclick="deleteposition([[ ${fval.manageId} ]])">delete</a>
+                </td>
+              </tr>
+              </th:black>
+            </tbody>
+          </table>      
+      </div>
+
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -137,7 +168,7 @@
         </div>
       </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
         crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>        
@@ -146,9 +177,10 @@
         var exampleModal = document.getElementById('exampleModal')
         exampleModal.addEventListener('show.bs.modal', function (event) {
             
-            console.log('modal close2');    
-            console.log(document.getElementById("dropDownCdModal").value); 
-            console.log(document.getElementById("dropDownCdModal").text); 
+        console.log('modal close2');    
+        console.log(document.getElementById("dropDownCdModal").value); 
+        console.log(document.getElementById("dropDownCdModal").text); 
+
         document.getElementById("manageIdModal").value = "";
         document.getElementById("dropDownCdModal").text = "Position Select";
         document.getElementById("textStringModal").value = "";
@@ -171,13 +203,44 @@
         modalTitle.textContent = 'New message to ' + recipient
         modalBodyInput.value = recipient
         })
+
+        /*<![CDATA[*/
+
+        function deleteposition(manageid) {
+            //th:formaction="@{/baseball/deleteposition(manageid=${fval.manageId})}"
+            if (confirm(manageid + "번 포지션을 삭제할까요?")) {
+                //alert(manageid);
+                var uri = /*[[ @{/baseball/deleteposition} ]]*/;
+                var html = "";
+
+                html += '<form name="dataForm" action="'+uri+'" method="post">';
+                html += '<input type="hidden" name="manageid" value="'+manageid+'" />';
+                html += '</form>';
+
+                $("body").append(html);
+                document.dataForm.submit();
+            }
+        }      
+        /*[- end of function -]*/
+
+        /*]]>*/
     </script>
     <script>
-        $('.modal').on('show.bs.modal', function (e) {
-            console.log('modal close1');
-            console.log($("#dropDownCdModal option:selected").val());
+        //$(document).ready(function(){
+        //    $("#btnDelete").click(function(){
+        //        var dialogYesNo = confirm("삭제하시겠습니까?");
+        //        if (dialogYesNo) {
+        //            form.submit();
+        //        } else {
+        //            return false;
+        //        }
+        //    })
+        //})
+        //$('.modal').on('show.bs.modal', function (e) {
+        //    console.log('modal close1');
+        //    console.log($("#dropDownCdModal option:selected").val());
             //$(this).find('form')[0].reset()
-        });
+        //});
     </script>    
 </body>
 

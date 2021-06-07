@@ -8,10 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import com.godcoder.myhome.service.baseballService;
 import com.godcoder.myhome.service.codeService;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -35,9 +32,11 @@ public class BaseBallController  implements WebMvcConfigurer {
     public String listPosition(Model model) {
 
         baseballDTO baseballDto = baseballservice.retrieveBaseball();
+        List<baseballDTO> baseballistDto = baseballservice.retrieveBaseballist();
         List<codeDTO> codeDto = codeservice.retrieveCode("01");
 
         model.addAttribute("baseball", baseballDto);
+        model.addAttribute("baseballist", baseballistDto);
         model.addAttribute("pos", codeDto);
 
         return "baseball/listposition";
@@ -61,6 +60,15 @@ public class BaseBallController  implements WebMvcConfigurer {
 
         //model.addAttribute("baseball", baseballDto);
         //model.addAttribute("pos", codeDto);
+
+        return "redirect:/baseball/listposition";
+    }
+
+    @PostMapping("/deleteposition")
+    public String listPosition(Model model
+                             , @RequestParam(required = false) String manageid) {
+
+        baseballservice.deleteBaseball(manageid);
 
         return "redirect:/baseball/listposition";
     }
