@@ -1,0 +1,107 @@
+- Thymeleaf 에서 '<', '>' 태그를 엄격하게 검사하기 때문에 자바스크립트 코드가 포함되어 있다면 [[CDATA]] 로 묶어줘야한다.
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+...
+<script type="text/javascript">
+function checkLevel() {
+	var rate = $("#level").val();
+	/*<![CDATA[*/
+	if (rate > 100) {
+		alert("레벨은 100 이하의 숫자여야 합니다.");
+		return;
+	}
+  /*]]>*/
+}
+</body>
+</html>
+
+- if / unless 사용
+<td th:if="${data.buyTime} != 0" th:text="${ddf.format(data.buyTime)}" ></td>
+<td th:unless="${data.buyTime} != 0">0</td>
+
+- ? 이항 연산자 사용
+<td th:text="${data.buyTime} ? ${customformat(data.buyTime)} : '0'" ></td>
+
+- switch / case 사용
+<td th:switch="${data.type}" >
+<span th:case="1" class="center-block label label-info">접속</span>
+<span th:case="2" class="center-block label label-primary">레벨업</span>
+<span th:case="3" class="center-block label label-warning">만료</span>
+</td>
+
+* select 사용
+- 컨트롤러에서 List<itemData> 를 생성해서 model.addAttribute("itemDatas", itemDataList) 형태로 전달하는 경우.
+<div class="row">
+	<label class="label col col-2">아이템 정보</label>
+	<div class="col col-10">
+		<label class="select"> 
+		 <select class="select" name="itemId" id="itemId">
+				<option value="0">ALL</option>
+				<option th:each="itemData : ${itemDatas}" th:value="${itemData.ItemId}" th:text="${itemData.itemId} + ' : ' + ${itemData.name}"></option>
+			</select><i></i>
+		</label>
+         </div>
+</div>
+
+- 컨트롤러에서 Map<Integer, String> 를 생성해서 model.addAttribute("itemDataMap", itemDataMap) 형태로 전달하는 경우.
+<div class="row">
+	<label class="label col col-2">아이템 정보</label>
+	<div class="col col-10">
+		<label class="select"> 
+			<select class="select" name="itemId" id="itemId">
+				<option th:each="itemData : ${itemDataMap}" th:value="${itemData.key}" th:text="${itemData.key} + ' : ' + ${itemData.value}"></option>
+			</select><i></i>
+		</label>
+
+- 컨트롤러에서 Map<Integer, ItemData> 를 생성해서 model.addAttribute("itemDataMap", itemDataMap) 형태로 전달하는 경우.
+@Data
+public class ItemData {
+    private int itemId;
+    private String name;
+}
+
+<div class="row">
+	<label class="label col col-2">아이템 정보</label>
+	<div class="col col-10">
+		<label class="select"> 
+			<select class="select" name="itemId" id="itemId">
+				<option th:each="itemData : ${itemDataMap}" th:value="${itemData.key}" 
+                        th:text="${itemData.key} + ' : ' + ${itemData.value.name}"></option>
+			</select><i></i>
+		</label>
+
+* table 사용
+- 컨트롤러에서 Map<Integer, String> 를 생성해서 model.addAttribute("itemDataMap", itemDataMap) 형태로 전달하는 경우.
+<tr th:if="${not #lists.isEmpty(datas)}" th:each="data : ${datas}">
+	<td>
+		<a data-toggle="modal" href="#dataModal" class="btn btn-xs btn-default" th:onclick="|javascript:changePopup('${data.seq}')|"> 
+			<i class="fa fa-times"></i>
+		</a>
+	</td>
+	<td th:text="${data.seq}" ></td>
+	<td th:text="${data.type}" ></td>
+	<td th:text="${data.itemId} + ':' + ${itemDataMap.get(data.itemId)}" ></td>
+	<td th:text="${data.text}" ></td>
+</tr>
+-> itemDataMap.get(id) 의 결과값은 itemData 의 이름이나 다른 값(value) 가 되겠다.
+
+* a href 사용
+- <a> 로 다른 페이지로 이동할 경우
+<td th:if="${data.num != 0}">
+<a href="/user/list?id=" th:attrappend="href=${data.id}" th:text="${id.num}"></a>
+</td>
+
+- 파라미터가 여러개(id=?, nick=?) 일 경우
+<td th:if="${data.num != 0}">
+<a th:href="@{/user/list(id=${data.id},nick=${data.nick})}" th:text="${data.num}"></a>
+</td>
+
+- 문자열(data.memo) 의 길이가 null 또는 0 size 일 경우에는 default 문자열을 보여주고, 일정 길이 이상일때는 잘라서 보여주는 예제
+<td>
+	<a href="#" class="btn btn-xs btn-default" 
+        th:text="${data.memo != null and #strings.length(data.memo) > 0} 
+                    ? ${#strings.abbreviate(data.memo,10)} 
+                    : '수정'" th:onclick="|javascript:editComment('${data.id}')|">
+    </a>
+</td>
+-> data.memo 의 문자열 길이가 10 자 이상일때, 10자 이후는 '...' 으로 보여주고, 기본은 '수정' 으로 보여준다.

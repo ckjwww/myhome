@@ -211,10 +211,12 @@
             if (confirm(manageid + "번 포지션을 삭제할까요?")) {
                 //alert(manageid);
                 var uri = /*[[ @{/baseball/deleteposition} ]]*/;
+                alert(uri);
                 var html = "";
 
                 html += '<form name="dataForm" action="'+uri+'" method="post">';
                 html += '<input type="hidden" name="manageid" value="'+manageid+'" />';
+                html += '<input type="hidden" name="manageid1" value="aaa" />';
                 html += '</form>';
 
                 $("body").append(html);
