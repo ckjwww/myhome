@@ -29,17 +29,49 @@ public class BaseBallController  implements WebMvcConfigurer {
     codeService codeservice;
 
     @GetMapping("/listposition")
-    public String listPosition(Model model) {
+    public String listPosition(Model model
+                            , @RequestParam(required = false) String manageid) {
 
-        baseballDTO baseballDto = baseballservice.retrieveBaseball();
+        baseballDTO baseballEmptyDto = new baseballDTO();
+        baseballDTO baseballDto = null;
+        if (manageid == null) {
+            baseballDto = new baseballDTO();
+        } else {
+            baseballDto = baseballservice.retrieveBaseball(manageid);
+        }
+
         List<baseballDTO> baseballistDto = baseballservice.retrieveBaseballist();
         List<codeDTO> codeDto = codeservice.retrieveCode("01");
 
-        model.addAttribute("baseball", baseballDto);
+        model.addAttribute("baseball", baseballEmptyDto);
+        model.addAttribute("baseballOne", baseballDto);
         model.addAttribute("baseballist", baseballistDto);
         model.addAttribute("pos", codeDto);
 
         return "baseball/listposition";
+    }
+
+    @GetMapping("/baseballmodal")
+    public String baseballmodal(Model model
+            , @RequestParam(required = false) String manageid) {
+
+        baseballDTO baseballEmptyDto = new baseballDTO();
+        baseballDTO baseballDto = null;
+        if (manageid == null) {
+            baseballDto = new baseballDTO();
+        } else {
+            baseballDto = baseballservice.retrieveBaseball(manageid);
+        }
+
+        List<baseballDTO> baseballistDto = baseballservice.retrieveBaseballist();
+        List<codeDTO> codeDto = codeservice.retrieveCode("01");
+
+        model.addAttribute("baseball", baseballEmptyDto);
+        model.addAttribute("baseballOne", baseballDto);
+        model.addAttribute("baseballist", baseballistDto);
+        model.addAttribute("pos", codeDto);
+
+        return "baseball/baseballmodal";
     }
 
     @PostMapping("/listposition")

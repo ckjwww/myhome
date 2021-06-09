@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.godcoder.myhome.mapper.baseballMapper">
-    <select id="retrieveBaseball" resultType="com.godcoder.myhome.entity.baseballDTO">
+    <select id="retrieveBaseball" parameterType="String" resultType="com.godcoder.myhome.entity.baseballDTO">
         <![CDATA[
             SELECT
                    A.MANAGE_ID manageId
@@ -14,7 +14,8 @@
                  , A.TEXT_DATE textDate
                  , A.TYPE_DATETIME typeDateTime
               FROM BASEBALL A, COMMON_CODE B
-             WHERE A.DROP_DOWN = B.IN_CD
+             WHERE A.MANAGE_ID = #{value}
+               AND A.DROP_DOWN = B.IN_CD
                AND B.KND_CD = '01'
           ORDER BY A.DROP_DOWN
           LIMIT 1

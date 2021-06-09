@@ -15,9 +15,9 @@ public class baseballService {
     @Autowired
     baseballMapper baseballmapper;
 
-    public baseballDTO retrieveBaseball(){
+    public baseballDTO retrieveBaseball(String manageId){
 
-        baseballDTO baseballDto = baseballmapper.retrieveBaseball();
+        baseballDTO baseballDto = baseballmapper.retrieveBaseball(manageId);
 
         if (baseballDto == null) {
             baseballDto = new baseballDTO();

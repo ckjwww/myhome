@@ -10,7 +10,7 @@ import java.util.List;
 @Mapper
 public interface baseballMapper {
 
-    baseballDTO retrieveBaseball();
+    baseballDTO retrieveBaseball(String manageId);
 
     List<baseballDTO> retrieveBaseballist();
 
