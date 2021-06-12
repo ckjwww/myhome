@@ -32,6 +32,21 @@
                         </div>                            
                     </div>
                     <div class="row mb-2">
+                        <div class="col-sm-3"></div>
+                        <div class="col-sm-8">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="radioButton1" name="radioButton" th:value="P" 
+                                        th:checked="${baseballOne.radioButton eq 'P' ? 'checked' : ''}" th:field="*{radioButton}">
+                                <label class="form-check-label" for="radioButton1">투수</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="radioButton2" name="radioButton" th:value="C" 
+                                        th:checked="${baseballOne.radioButton eq 'C' ? 'checked' : ''}" th:field="*{radioButton}">
+                                <label class="form-check-label" for="radioButton2">포수</label>
+                            </div>
+                        </div>              
+                    </div>        
+                    <div class="row mb-2">
                         <label class="form-check-label col-sm-3 text-end" for="textString">String</label>
                         <div class="col-sm-8">
                         <input type="text" class="form-control" id="textStringModal" th:field="*{textString}" th:text="${textString}">
@@ -57,8 +72,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                <button type="submit" class="btn btn-primary">추가</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
                 </div>
             </form>            
 

@@ -17,7 +17,7 @@
     </nav>
 
     <div class="container">
-        <form action="#" th:action="@{/baseball/listposition}" th:object="${baseball}" method="post">
+        <form action="#" th:action="@{/baseball/listposition}" th:object="${baseball}" method="post" enctype="multipart/form-data">
             <div class="row mb-3">
                 <input type="text" class="form-control" id="manageId" th:field="*{manageId}" th:value="${manageId}">
                 <label for="dropdownCd" class="col-sm-1 col-form-label">포지션</label>
@@ -74,9 +74,15 @@
                     <input type="datetime-local" class="form-control" id="typeDateTime" th:field="*{typeDateTime}" th:text="${#dates.format(typeDateTime, 'yyyy-MM-dd')}">
                 </div>
             </div>
+            <div class="row mb-3">
+                <label class="form-check-label col-sm-1 text-end" for="files">String</label>
+                <div class="col-sm-11">
+                    <input class="form-control form-control-sm" name="files" type="file">
+                </div>
+            </div>
             <div>
                 <button type="submit" class="btn btn-primary">저장</button>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="">추가</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="" th:onclick="fnModuleInfo('')">추가</button>
             </div>
         </form>
     </div>
@@ -104,7 +110,7 @@
                 <td th:text="${fval.textString}">textString</td>
                 <td>
                     <a type="button" class="btn btn-primary" id="btnUpdate" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever=""
-                        th:href="@{/baseball/listposition(manageid=${fval.manageId})}" th:onclick="fnModuleInfo([[ ${fval.manageId} ]])">update</a>
+                       th:onclick="fnModuleInfo([[ ${fval.manageId} ]])">update</a>
                     <a type="button" class="btn btn-primary" id="btnDelete" th:onclick="deleteposition([[ ${fval.manageId} ]])">delete</a>
                 </td>
               </tr>
@@ -183,7 +189,7 @@
         }
         
         function fnModuleInfo(str){
-            alert("updateclick : " + str);
+            //alert("updateclick : " + str);
             $('#exampleModal .modal-content').load("/baseball/baseballmodal?manageid="+str);
             $('#exampleModal').modal();
         }
