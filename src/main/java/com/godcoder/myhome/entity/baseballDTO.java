@@ -19,6 +19,7 @@ public class baseballDTO {
     private String radioButton;
     private String textString;
     private Integer textInteger;
+    private Integer fileId;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date textDate;

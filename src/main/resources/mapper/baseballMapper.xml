@@ -13,6 +13,7 @@
                  , A.TEXT_INTEGER textInteger
                  , A.TEXT_DATE textDate
                  , A.TYPE_DATETIME typeDateTime
+                 , A.FILE_ID fileId
               FROM BASEBALL A, COMMON_CODE B
              WHERE A.MANAGE_ID = #{value}
                AND A.DROP_DOWN = B.IN_CD
@@ -34,6 +35,7 @@
                  , A.TEXT_INTEGER textInteger
                  , A.TEXT_DATE textDate
                  , A.TYPE_DATETIME typeDateTime
+                 , A.FILE_ID fileId
               FROM BASEBALL A, COMMON_CODE B
              WHERE A.DROP_DOWN = B.IN_CD
                AND B.KND_CD = '01'
