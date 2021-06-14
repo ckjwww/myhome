@@ -97,6 +97,7 @@
                 <th scope="col">CheckBox</th>
                 <th scope="col">Radio Button</th>
                 <th scope="col">String</th>
+                <th scope="col">FILE_ID</th>
                 <th scope="col">CRUD</th>
               </tr>
             </thead>
@@ -108,10 +109,12 @@
                 <td th:text="${fval.checkBox}">checkBox</td>
                 <td th:text="${fval.radioButton}">radioButton</td>
                 <td th:text="${fval.textString}">textString</td>
+                <td th:text="${fval.fileId}">FILE_ID</td>
                 <td>
                     <a type="button" class="btn btn-primary" id="btnUpdate" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever=""
                        th:onclick="fnModuleInfo([[ ${fval.manageId} ]])">update</a>
                     <a type="button" class="btn btn-primary" id="btnDelete" th:onclick="deleteposition([[ ${fval.manageId} ]])">delete</a>
+                    <a type="button" class="btn btn-primary" id="btnFileDownLoad" th:href="@{/baseball/baseballfiledownload(fileid=${fval.fileId})}">fileDownLoad</a>
                 </td>
               </tr>
               </th:black>

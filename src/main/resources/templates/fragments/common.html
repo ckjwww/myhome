@@ -23,17 +23,20 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
                 <li class="nav-item">
-                <a class="nav-link" th:classappend="${menu}=='index' ? 'active'" aria-current="page" href="#" th:href="@{/}">홈</a>
+                    <a class="nav-link" th:classappend="${menu}=='index' ? 'active'" aria-current="page" href="#" th:href="@{/}">홈</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" th:classappend="${menu}=='list' ? 'active'" href="#" th:href="@{../board/list}">게시판</a>
+                    <a class="nav-link" th:classappend="${menu}=='list' ? 'active'" href="#" th:href="@{../board/list}">게시판</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" th:classappend="${menu}=='listPositon' ? 'active'" href="#" th:href="@{../baseball/listposition}">BaseBall</a>
-                    </li>                                
+                </li>                
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${menu}=='lab' ? 'active'" href="#" th:href="@{../lab/labfilesample}">FILE</a>
+                </li>                                                
                 <li class="nav-item">
                     <a class="nav-link" th:classappend="${menu}=='list' ? 'active'" href="#" th:href="@{board/test}">valid</a>
-                    </li>                
+                </li>                
             </ul>
             <form class="d-flex">
                 <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
