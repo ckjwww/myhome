@@ -121,3 +121,58 @@ public class ItemData {
 	}
 </script>
 https://badstorage.tistory.com/18
+
+- json 리턴
+
+- case 1
+@RestController
+public class TestController {
+
+    @RequestMapping("/test1")
+    public Blog test1(){
+
+        Blog blog = new Blog();
+
+        blog.setTitle("테스트1");
+        blog.setContent("테스트1 내용");
+
+        return blog;
+    }
+}
+- case 2
+@Controller
+public class TestController {
+
+  @ResponseBody
+  @RequestMapping("/test3")
+  public String test3(){
+    JsonObject obj =new JsonObject();
+
+    obj.addProperty("title", "테스트3");
+    obj.addProperty("content", "테스트3 내용");
+
+    JsonObject data = new JsonObject();
+
+    data.addProperty("time", "12:00");
+
+    obj.add("data", data);
+
+    return obj.toString();
+  }
+}
+-case 3
+@Controller
+public class TestController {
+
+    @ResponseBody
+    @RequestMapping("/test2")
+    public Blog test2(){
+
+        Blog blog = new Blog();
+
+        blog.setTitle("테스트2");
+        blog.setContent("테스트2 내용");
+
+        return blog;
+     }
+}

@@ -31,7 +31,8 @@ public class labController {
     }
 
     @PostMapping("/labfilesample")
-    public String labfilesample(MultipartHttpServletRequest files) {
+    public String labfilesample(MultipartHttpServletRequest files
+                              , @RequestParam(required = false) List<String> inputvalue) {
         String path = Paths.get("C:", "develop", "server-file").toString();
 
         List<MultipartFile> mfiles = files.getFiles("files");
