@@ -176,3 +176,31 @@ public class TestController {
         return blog;
      }
 }
+
+- 콤보박스 이미지선택 뷰 하기
+<p align="center">
+<select size="1" onchange="if(this.value != '')imgChanger(this.value)">
+<option value="">선택해 보아요~</option>
+<option value="/images/helper/smp_400_01.jpg">이미지 1</option>
+<option value="/images/helper/smp_400_02.jpg">이미지 2</option>
+<option value="/images/helper/smp_400_03.jpg">이미지 3</option>
+<option value="/images/helper/smp_400_04.jpg">이미지 4</option>
+<option value="/images/helper/smp_400_05.jpg">이미지 5</option>
+<option value="/images/helper/smp_400_06.jpg">이미지 6</option>
+<option value="/images/helper/smp_400_07.jpg">이미지 7</option>
+<option value="/images/helper/smp_400_08.jpg">이미지 8</option>
+<option value="/images/helper/smp_400_09.jpg">이미지 9</option>
+<option value="/images/helper/smp_400_10.jpg">이미지 10</option>
+</select>
+<br><img src="/images/common/sp.gif" id="imgs">
+</p>
+
+<script language="JavaScript">
+<!--
+	// 아주 간단한 소스 입니다. ^^;
+
+	function imgChanger(str){
+		document.getElementById('imgs').src = str;
+	}
+//-->
+</script>
