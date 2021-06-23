@@ -76,14 +76,23 @@
     <br>
     <div class="container">
         <button type="button" class="btn btn-primary mb-3" onclick="funsearch()">파일찾기</button>
+        <button type="button" class="btn btn-primary mb-3" onclick="addimage()">image add</button>
+        <button type="button" class="btn btn-primary mb-3" onclick="addtext()">text add</button>
         <div class="row">
             <img id="imageid" style="width:200px" src="../image/1.jpg">
         </div>
         <div class="row">
             <div class="col-sm-5">
-            <ul class="list-group">
-                <li class="list-group-item"><a><img id="imageid" style="width:200px" src="../image/1.jpg"></a></li>
-                <li class="list-group-item"><a><img id="imageid" style="width:200px" src="../image/1.jpg"></a></li>
+                <ul class="list-group">
+                    <li class="list-group-item"><img id="imageid" style="width:200px" src="../image/1.jpg"></li>
+                    <li class="list-group-item"><a><img id="imageid" style="width:200px" src="../image/1.jpg"></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-5">
+            <ul class="list-group" id="addimage">
+                
             </ul>
             </div>
         </div>
@@ -122,7 +131,7 @@
             input.onchange = _ => {
                 // you can use this method to get file and perform respective operations
                 
-                let files =   Array.from(input.files);
+                let files = Array.from(input.files);
                 
                 console.log(files);
                 //console.log(files[0].val);
@@ -131,13 +140,62 @@
                 console.log(tmppath);
                 document.getElementById("imageid").src=tmppath;
 
-
-
                 //file:///C:\Videos\lecture.mp4"
                 //document.getElementById("imageid").src=files[0].name;
                 
             };
             input.click();
+        }
+        function addimage() {
+
+            let input = document.createElement('input');
+            input.type = 'file';
+            input.onchange = _ => {
+                // you can use this method to get file and perform respective operations
+                
+                let files = Array.from(input.files);
+                
+                console.log(files);
+                var tmppath = URL.createObjectURL(event.target.files[0]);
+                document.getElementById("imageid").src=tmppath;
+                
+                //<ul class="list-group">
+                //    <li class="list-group-item"><a><img id="imageid" style="width:200px" src="../image/1.jpg"></a></li>
+                //    <li class="list-group-item"><a><img id="imageid" style="width:200px" src="../image/1.jpg"></a></li>
+                //</ul>
+                
+                const tagimg = document.createElement("img");
+                tagimg.setAttribute('src', tmppath);
+                tagimg.style.width = '200px';
+                
+                const li = document.createElement("li");
+                li.setAttribute('class',"list-group-item");
+                
+                li.appendChild(tagimg);
+                
+                // // 3. 생성된 li를 ul에 추가
+                document
+                     .getElementById('addimage')
+                     .appendChild(li);
+            };
+            input.click();
+        }
+        function addtext() {
+
+            const addValue = "test";
+                
+                // // 2-2. li에 id 속성 추가 
+                const li = document.createElement("li");
+                li.setAttribute('id',addValue);
+                li.setAttribute('class',"list-group-item");
+                
+                const textNode = document.createTextNode(addValue);
+                li.appendChild(textNode);
+                
+                // // 3. 생성된 li를 ul에 추가
+                document
+                    .getElementById('addimage')
+                    .appendChild(li);
         }
     </script>
 </body>
