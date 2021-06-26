@@ -10,6 +10,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
 
     <title th:text="${title}">Hello~ Spring Boot!</title>
+
+    <!-- AUI Grid 사용을 위해 필요한 소스를 불러옵니다.-->
+    <script type="text/javascript" src="../../AUIGrid/AUIGridLicense.js" ></script>
+    <script type="text/javascript" src="../../AUIGrid/AUIGrid.js" ></script>
+    <!-- 스타일 시트 로드 -->
+    <link href="../../AUIGrid/AUIGrid_style.css" rel="stylesheet"/>    
 </head>
 
 
@@ -34,6 +40,9 @@
                 <li class="nav-item">
                     <a class="nav-link" th:classappend="${menu}=='lab' ? 'active'" href="#" th:href="@{../lab/labfilesample}">FILE</a>
                 </li>                                                
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${menu}=='grid' ? 'active'" href="#" th:href="@{../lab/gridsample}">GRID</a>
+                </li>                                                                
                 <li class="nav-item">
                     <a class="nav-link" th:classappend="${menu}=='list' ? 'active'" href="#" th:href="@{board/test}">valid</a>
                 </li>                
