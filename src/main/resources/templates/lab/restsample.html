@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+    <title th:text="${title}">Hello~ Spring Boot1!</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- AUI Grid 사용을 위해 필요한 소스를 불러옵니다.-->
+    <script type="text/javascript" src="../../AUIGrid/AUIGridLicense.js" ></script>
+    <script type="text/javascript" src="../../AUIGrid/AUIGrid.js" ></script>
+    <!--<script type="text/javascript" src="../../AUIGridJS/ajax.js" ></script> -->
+
+    <!-- ajax 요청을 위한 스크립트입니다. -->
+    <script type="text/javascript" src="../../AUIGrid/ajax.js"></script>
+
+    <!-- 데모를 위한 스크립트입니다. -->
+    <script type="text/javascript" src="../../AUIGrid/demo.js"></script>
+
+    <!-- 공용 Ajax 요청 스크립트 -->
+    <script type="text/javascript" src="../../AUIGrid/common.js"></script>    
+
+    <!-- 스타일 시트 로드 -->
+    <link href="../../AUIGrid/AUIGrid_style.css" rel="stylesheet"/>
+
+    <script type="text/javascript">
+        console.log("text/javascript");
+
+        function documentReady() {  
+            console.log("documentReady");
+
+            // AUIGrid 그리드를 생성합니다.
+            createAUIGrid(columnLayout);
+            
+            // 데이터 요청, 요청 성공 시 AUIGrid 에 데이터 삽입합니다.
+            //requestData("../image/revenue_region.json");
+        };
+
+        // AUIGrid 칼럼 설정
+        var columnLayout = [{
+            dataField: "nickname",
+            headerText: "별명",
+            width: 120
+        }, {
+            dataField: "weight",
+            headerText: "weight",
+            dataType : "numeric"
+        }, {
+            dataField: "idx",
+            headerText: "idx",
+            dataType : "numeric"
+        }, {
+            dataField: "height",
+            headerText: "height",
+            dataType : "numeric"
+        }];        
+
+        // AUIGrid 를 생성합니다.
+        function createAUIGrid(columnLayout) {
+            
+            var auiGridProps = {};
+        
+            auiGridProps.enableSorting = true;
+        
+            // singleRow 선택모드
+            auiGridProps.selectionMode = "multipleCells";
+            
+            // 고정 칼럼 1개
+            auiGridProps.fixedColumnCount = 1;
+            
+            // 줄번호 칼럼 렌더러 출력 안함
+            auiGridProps.showRowNumColumn = false;
+        
+            // 체크박스 표시 렌더러 출력 안함
+            auiGridProps.showRowCheckColumn = false;
+            
+            // 실제로 #grid_wrap 에 그리드 생성
+            myGridID = AUIGrid.create("#grid_wrap", columnLayout, auiGridProps);
+        }
+
+        function getdata() {
+            console.log("getdata");
+
+            requestData("../../grid/members1");
+        }
+    </script>    
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4" th:replace="fragments/common.html :: menu('rest')">
+    </nav>   
+	<div class="container">
+        <p>grid</p>
+        <div class="mb-3">
+            <button class="btn btn-primary" onclick="getdata()">data load</button>
+        </div>
+		<!-- 에이유아이 그리드가 이곳에 생성됩니다. -->
+		<div id="grid_wrap" style="width:1200px; height:480px; margin:0 auto;"></div>
+	</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>        
+</body>
+</html>
