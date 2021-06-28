@@ -1,8 +1,6 @@
 package com.godcoder.myhome.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/grid")
+@RequestMapping("/v1/grid")
 public class restController {
 
-    @GetMapping(value = "/members")
+    @GetMapping(value = "/members.do")
     public Map<Integer, Object> testByResponseBody() {
 
         Map<Integer, Object> members = new HashMap<>();
@@ -30,8 +28,8 @@ public class restController {
         return members;
     }
 
-    @GetMapping(value = "/members1")
-    public List<Object> members() {
+    @GetMapping(value = "/members1.do/{contId}")
+    public List<Object> members(@PathVariable("contId") String contId) {
 
         ArrayList<Object> list = new ArrayList<Object>();
 

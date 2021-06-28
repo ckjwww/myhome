@@ -87,7 +87,33 @@
         function getdata() {
             console.log("getdata");
 
-            requestData("../../grid/members1");
+            let inContId = "1";
+
+            $.ajax({
+                url: "../../v1/grid/members1.do/" + inContId,
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                data: "",
+                success: function(data){
+
+                    // 그리드에 데이터 세팅
+			        // data 는 JSON 을 파싱한 Array-Object 입니다.
+                    AUIGrid.setGridData(myGridID, data);
+
+			        // 로더 제거
+			        AUIGrid.removeAjaxLoader(myGridID);
+                },
+                error: function (request, status, error){
+                    
+                    alert("데이터 요청에 실패하였습니다.\r status : " + status);
+			        
+                    // 로더 제거
+			        AUIGrid.removeAjaxLoader(myGridID);
+                }
+            });
+
+            //requestData("../../grid/members1");
         }
     </script>    
 </head>

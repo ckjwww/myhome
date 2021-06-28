@@ -1,3 +1,22 @@
+Contents
+ 1. [Thymeleaf]Thymeleaf 에서 '<', '>' 태그를 엄격하게 검사하기 때문에 자바스크립트 코드가 포함되어 있다면 [[CDATA]] 로 묶어줘야한다.
+ 2. [Thymeleaf]if / unless 사용 
+ 3. [Thymeleaf]컨트롤러에서 List<itemData> 를 생성해서 model.addAttribute("itemDatas", itemDataList) 형태로 전달하는 경우 (SELECT 컨트롤 만들기)
+ 4. [Thymeleaf]컨트롤러에서 Map<Integer, String> 를 생성해서 model.addAttribute("itemDataMap", itemDataMap) 형태로 전달하는 경우.
+ 5. [Thymeleaf]컨트롤러에서 Map<Integer, ItemData> 를 생성해서 model.addAttribute("itemDataMap", itemDataMap) 형태로 전달하는 경우.
+ 6. [Thymeleaf]table 사용- 컨트롤러에서 Map<Integer, String> 를 생성해서 model.addAttribute("itemDataMap", itemDataMap) 형태로 전달하는 경우.
+ 7. [Thymeleaf]a href 사용
+   - a href 사용 (href get 파라미터 설정하기) th:attrappend
+   - 파라미터가 여러개(id=?, nick=?) 일 경우
+ 8. [Thymeleaf]문자열(data.memo) 의 길이가 null 또는 0 size 일 경우에는 default 문자열을 보여주고, 일정 길이 이상일때는 잘라서 보여주는 예제
+ 9. [Thymeleaf]Foreach 사용하는 법 - script 영역에서 Thymeleaf Foreach 문법을 사용해서 처리
+10. [spring boot]json 리턴
+11. [javascript]콤보박스에 있는 이미지 선택했을 때 이미지보여주기
+12. ajax
+    - ajax 파라미터 vo로 받는 방법
+    - ajax 파라미터 map 으로 받는 방법 
+
+
 - Thymeleaf 에서 '<', '>' 태그를 엄격하게 검사하기 때문에 자바스크립트 코드가 포함되어 있다면 [[CDATA]] 로 묶어줘야한다.
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
@@ -35,12 +54,12 @@ function checkLevel() {
 	<label class="label col col-2">아이템 정보</label>
 	<div class="col col-10">
 		<label class="select"> 
-		 <select class="select" name="itemId" id="itemId">
+		 	<select class="select" name="itemId" id="itemId">
 				<option value="0">ALL</option>
 				<option th:each="itemData : ${itemDatas}" th:value="${itemData.ItemId}" th:text="${itemData.itemId} + ' : ' + ${itemData.name}"></option>
 			</select><i></i>
 		</label>
-         </div>
+	</div>
 </div>
 
 - 컨트롤러에서 Map<Integer, String> 를 생성해서 model.addAttribute("itemDataMap", itemDataMap) 형태로 전달하는 경우.
@@ -204,3 +223,50 @@ public class TestController {
 	}
 //-->
 </script>
+
+- ajax 파라미터 vo로 받는 방법
+var memberId = $("#memberId").val();
+var memberPass = $("#memberPass").val();
+var param = {"memberId":memberId, "memberPass":memberPass}
+$.ajax({
+		anyne:true,
+		type:'POST',
+		data: JSON.stringify(param),
+		url:"/memberModify",
+		dataType: "text",
+		success : function(data) {
+		alert("비밀번호 변경이 완료되었습니다.");
+		location.href="/boardList";
+	},
+	error: function(jqXHR, textStatus, errorThrown) {
+		alert("ERROR : " + textStatus + " : " + errorThrown);
+	}
+});
+
+	@RequestMapping(value="/memberModify", method=RequestMethod.POST)
+	public String memberModifyPOST(@RequestBody MemberVO memberVO) throws Exception {
+		boardService.memberModifyPOST(memberVO);
+		return "memberModify";
+	}
+
+- ajax 파라미터 map 으로 받는 방법
+$.ajax({ // 컨트롤러와 통신
+		type: 'POST',
+		url: "/test",
+		data: {"id": id, 'email': email},
+		contentType: "application/json; charset=UTF-8",
+		success: function(data) {
+		alert("성공");
+	},
+	error: function(jqXHR, textStatus, errorThrown) {
+		alert("ERROR : " + textStatus + " : " + errorThrown);
+	}
+});
+	@RequestMapping(value="/test")
+	public String test(@RequestParam Map<String, Object> param) {
+		String id = (String) param.get("id");
+		return "test";
+	}
+
+- 각종 ajax 로 데이타 처리 방법
+https://myjamong.tistory.com/17	
