@@ -1,17 +1,17 @@
-// ajax �붿껌 �꾩뿭 �⑥닔...湲곕낯�곸쑝濡� XMLHttpRequest 瑜� �ъ슜�섎ŉ
-// IE�� 寃쎌슦 ��踰꾩쟾(XMLHttpRequest 吏��먰븯吏� �딅뒗 釉뚮씪�곗�) 泥댄겕�섏뿬 XMLHTTP 濡� �붿껌�섎뒗 紐⑤뱢�낅땲��.
-// jQuery�� 媛숈씠 AUIGrid 瑜� �ъ슜�쒕떎硫� 援녹씠 �� �⑥닔 �ъ슜�� �꾩슂 �놁뒿�덈떎. jQuery �� ajax 媛� �덉쑝�� 洹멸구 �ъ슜�섏꽭��.
+// ajax 요청 전역 함수...기본적으로 XMLHttpRequest 를 사용하며
+// IE인 경우 저버전(XMLHttpRequest 지원하지 않는 브라우저) 체크하여 XMLHTTP 로 요청하는 모듈입니다.
+// jQuery와 같이 AUIGrid 를 사용한다면 굳이 이 함수 사용할 필요 없습니다. jQuery 에 ajax 가 있으니 그걸 사용하세요.
 function ajax(props) {
     var target = props.target ? props.target : null;
     var currentTarget = props.currentTarget ? props.currentTarget : null;
     var isLocal =  location.href.indexOf("http") >= 0  && location.href.indexOf("http") <= 3 ? false : true;
     props = {
-        type: props.type || "GET", // �붿껌 硫붿냼��(get or post)
-	    url: props.url || "", // �붿껌 URL
-	    timeout: props.timeout || 30000, // �묐떟 ���꾩븘��
-	    onError: props.onError || function() {}, // �먮윭 �몃뱾��
-	    onSuccess: props.onSuccess || function() {}, // �깃났 �몃뱾��
-	    data: props.data || "" // �붿껌 �� 蹂대궪 �곗씠��(�뚮씪硫뷀꽣)
+        type: props.type || "GET", // 요청 메소드(get or post)
+	    url: props.url || "", // 요청 URL
+	    timeout: props.timeout || 30000, // 응답 타임아웃
+	    onError: props.onError || function() {}, // 에러 핸들러
+	    onSuccess: props.onSuccess || function() {}, // 성공 핸들러
+	    data: props.data || "" // 요청 시 보낼 데이터(파라메터)
     };
     var i, xhr, activeXObjects = ["MSXML2.XMLHTTP.3.0", "MSXML2.XMLHTTP", "Microsoft.XMLHTTP"];
     if ("ActiveXObject" in window) {

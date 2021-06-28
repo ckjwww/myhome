@@ -2,7 +2,7 @@
 if ( document.addEventListener ) {
     document.addEventListener( "DOMContentLoaded", function(){
       document.removeEventListener( "DOMContentLoaded", arguments.callee, false);
-      initDemo(); //�곕え瑜� �꾪븳 �ㅽ겕由쏀듃
+      initDemo(); //데모를 위한 스크립트
       //try{
           documentReady();
           loadScroll();
@@ -16,7 +16,7 @@ if ( document.addEventListener ) {
     document.attachEvent("onreadystatechange", function(){
       if ( document.readyState === "complete" ) {
         document.detachEvent( "onreadystatechange", arguments.callee );
-        initDemo(); //�곕え瑜� �꾪븳 �ㅽ겕由쏀듃
+        initDemo(); //데모를 위한 스크립트
         //try{
             documentReady();
             loadScroll();
@@ -45,7 +45,7 @@ if ( document.addEventListener ) {
       return _parammap[key];
   };
   
-  // 紐⑤컮�� �붾㈃�� 寃쎌슦 硫붾돱 異쒕젰
+  // 모바일 화면인 경우 메뉴 출력
   var menuDisplayed = false;
   function mobileBtnClick() {
       if(!menuDisplayed) {
@@ -57,7 +57,7 @@ if ( document.addEventListener ) {
       }
   };
       
-  // �곕え 硫붾돱 �≫떚釉� �ㅽ��� 留뚮뱾湲�
+  // 데모 메뉴 액티브 스타일 만들기
   function initDemo() {
       var url = location.href;
       var idx = url.indexOf("?");
@@ -73,7 +73,7 @@ if ( document.addEventListener ) {
           }
       }
       
-      // theme ���됲듃 �좏깮
+      // theme 셀렉트 선택
       var select = document.getElementById("themeSelect");
       if(!select)
           return;
