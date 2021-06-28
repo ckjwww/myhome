@@ -45,4 +45,38 @@ public class restController {
         return list;
     }
 
+    @GetMapping(value = "/custom.do")
+    public List<Object> custom() {
+
+        ArrayList<Object> list = new ArrayList<Object>();
+
+        for (int i = 1; i <= 5; i++) {
+            Map<String, Object> member = new HashMap<>();
+            member.put("custId", i);
+            member.put("custName", "삼프로" + i);
+            member.put("phone", "010-5896-125" + i);
+            member.put("email", "global" + i + "@sampro.com");
+            list.add(member);
+        }
+
+        return list;
+    }
+
+    @GetMapping(value = "/customlist.do/{custId}")
+    public List<Object> customlist(@PathVariable("custId") String custId) {
+
+        ArrayList<Object> list = new ArrayList<Object>();
+
+        for (int i = 1; i <= 20; i++) {
+            Map<String, Object> member = new HashMap<>();
+            member.put("idx", i);
+            member.put("nickname", i + "길동");
+            member.put("height", i + 20);
+            member.put("weight", i + 30);
+            list.add(member);
+        }
+
+        return list;
+    }
+
 }

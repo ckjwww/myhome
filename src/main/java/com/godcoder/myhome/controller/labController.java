@@ -36,6 +36,12 @@ public class labController {
         return "lab/restsample";
     }
 
+    @GetMapping("mstdtlsample")
+    public String mstdtlsample () {
+
+        return "lab/mstdtlsample";
+    }
+
     @PostMapping("/labfilesample")
     public String labfilesample(MultipartHttpServletRequest files
                               , @RequestParam(required = false) List<String> inputvalue) {
