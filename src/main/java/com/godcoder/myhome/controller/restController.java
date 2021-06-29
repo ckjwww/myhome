@@ -67,12 +67,13 @@ public class restController {
 
         ArrayList<Object> list = new ArrayList<Object>();
 
-        for (int i = 1; i <= 20; i++) {
+        for (int i = 1; i <= 5; i++) {
             Map<String, Object> member = new HashMap<>();
-            member.put("idx", i);
-            member.put("nickname", i + "길동");
-            member.put("height", i + 20);
-            member.put("weight", i + 30);
+            member.put("custId", custId);
+            member.put("orderId", "ORDER20210629" + i);
+            member.put("product", "삼프로" + i);
+            member.put("quantity", i + 30);
+            member.put("date", "2021-06-29");
             list.add(member);
         }
 

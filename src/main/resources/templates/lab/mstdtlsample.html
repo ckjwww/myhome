@@ -83,11 +83,11 @@
                 showRowNumColumn : false,
 
                 // singleRow 선택모드
-                selectionMode : "singleRow",
+                selectionMode : "multipleRows",
                 
                 rowIdField : "custId",
 
-                showRowCheckColumn : false
+                showRowCheckColumn : true
             };
 
             // 실제로 #grid_wrap 에 그리드 생성
@@ -129,14 +129,14 @@
             };
 
             // 실제로 #grid_wrap2 에 그리드 생성
-            myGridID2 = AUIGrid.create("#grid_detail", columnLayout, gridPros);
+            myGridDtl = AUIGrid.create("#grid_detail", columnLayout, gridPros);
         }
 
         // 그리드 ready 이벤트 핸들러
         function auiGridCompleteHandler(event) {
             
             // 마스터 그리드가 로딩 완료된 시점에 고객 ID 가 cust3 인 곳에 셀렉션 지정
-            AUIGrid.selectRowsByRowId(myGridMst, "cust3");
+            AUIGrid.selectRowsByRowId(myGridMst, 1);
             
             //document.getElementById("detail_info").innerHTML = "고객 ID : cust3 Details";
             
@@ -164,10 +164,10 @@
                 var custId = rowItem.custId; // 선택한 행의 고객 ID 값
                 
                 // 디테일 정보 표시
-                //document.getElementById("detail_info").innerHTML = "고객 ID : " + custId + " Details";
+                document.getElementById("info").innerHTML = "고객 ID : " + custId + " Details";
                 
                 // rowId 에 맞는 디테일 데이터 요청 후 디테일 그리드에 삽입
-                //requestMyData("./data/getJsonDetails.php?id=" + custId , myGridID2);
+                getRequestData("../../v1/grid/customlist.do/" + custId , myGridDtl);
             }, 200);  // 현재 200ms 민감도....환경에 맞게 조절하세요.
         };
 
@@ -175,31 +175,6 @@
             console.log("getdata");
 
             getRequestData("../../v1/grid/custom.do", myGridMst);
-            // $.ajax({
-            //     url: "../../v1/grid/custom.do",
-            //     type: "GET",
-            //     cache: false,
-            //     dataType: "json",
-            //     data: "",
-            //     success: function(data){
-
-            //         // 그리드에 데이터 세팅
-			//         // data 는 JSON 을 파싱한 Array-Object 입니다.
-            //         AUIGrid.setGridData(myGridMst, data);
-
-			//         // 로더 제거
-			//         AUIGrid.removeAjaxLoader(myGridMst);
-            //     },
-            //     error: function (request, status, error){
-                    
-            //         alert("데이터 요청에 실패하였습니다.\r status : " + status);
-			        
-            //         // 로더 제거
-			//         AUIGrid.removeAjaxLoader(myGridMst);
-            //     }
-            // });
-
-            //requestData("../../grid/members1");
         }
 
         function getRequestData(callUrl, objGridid) {
@@ -232,6 +207,27 @@
         function setColumnSize() {
             AUIGrid.setColumnSizeList(myGridID, [100, 100, 100, 100]);	
         }
+
+        function codeTest() {
+            var checkedItems = AUIGrid.getCheckedRowItems(myGridMst);
+	
+            var str = "";
+            if(checkedItems.length <= 0) {
+		        str = "없음";
+
+	        } else {
+	            
+                var str = "";
+	            var rowItem;
+	
+                for(var i=0, len = checkedItems.length; i<len; i++) {
+		            rowItem = checkedItems[i];
+		            str += rowItem.rowIndex + " / ";
+	            }
+
+            }
+            document.getElementById("txtVal").innerHTML = "select row : " + str;    
+        }
     </script>    
 </head>
 <body>
@@ -242,6 +238,7 @@
         <div class="mb-3">
             <button class="btn btn-primary" onclick="getdata()">data load</button>
             <button class="btn btn-primary" onclick="setColumnSize()">column size</button>
+            <button class="btn btn-primary" onclick="codeTest()">aui function test</button>
         </div>
 		<!-- 에이유아이 그리드가 이곳에 생성됩니다. -->
         <div class="row mb-4">
@@ -256,6 +253,10 @@
 
         <div class="row">
             <p id="info">info</p>
+        </div>
+
+        <div class="row">
+            <p id="txtVal">testValue</p>
         </div>
 	</div>
 
