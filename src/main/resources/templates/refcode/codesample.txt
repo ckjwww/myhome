@@ -15,6 +15,7 @@ Contents
 12. ajax
     - ajax 파라미터 vo로 받는 방법
     - ajax 파라미터 map 으로 받는 방법 
+13. aui grid 변경된 데이타 전송	
 
 
 - Thymeleaf 에서 '<', '>' 태그를 엄격하게 검사하기 때문에 자바스크립트 코드가 포함되어 있다면 [[CDATA]] 로 묶어줘야한다.
@@ -270,3 +271,30 @@ $.ajax({ // 컨트롤러와 통신
 
 - 각종 ajax 로 데이타 처리 방법
 https://myjamong.tistory.com/17	
+
+
+- aui grid 변경된 데이타 전송
+
+// 추가된 행 아이템들(배열)
+var addedRowItems = AUIGrid.getAddedRowItems(myGridID);
+
+// 수정된 행 아이템들(배열)
+var editedRowItems = AUIGrid.getEditedRowItems(myGridID); 
+
+// 수정된 행 아이템들(배열) - 진짜 수정될 필드만 갖고 있음.
+// 예를들어 칼럼이 총 10개 있다고 했을 때 그 중 2개 칼럼만 수정했다면 해당 2개 칼럼만을 반환합니다.
+//var editedRowItems = AUIGrid.getEditedRowColumnItems(myGridID);
+	
+// 삭제된 행 아이템들(배열)
+var removedRowItems = AUIGrid.getRemovedItems(myGridID);
+
+// 서버로 보낼 데이터 작성
+var data = {
+	"add" : addedRowItems,
+	"update" : editedRowItems,
+	"remove" : removedRowItems
+};
+
+// data 가 어떻게 만들어졌는지 확인해 보십시오.
+console.log(JSON.stringify(data));
+alert(JSON.stringify(data));
