@@ -1,5 +1,7 @@
 package com.godcoder.myhome.controller;
 
+import com.godcoder.myhome.entity.customDTO;
+import com.godcoder.myhome.entity.customSet;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -74,6 +76,25 @@ public class restController {
             member.put("product", "삼프로" + i);
             member.put("quantity", i + 30);
             member.put("date", "2021-06-29");
+            list.add(member);
+        }
+
+        return list;
+    }
+
+    @ResponseBody
+    @PostMapping(value = "/post/custom.do")
+    //public List<Object> postCustom(@RequestBody customSet cSet) {
+    public List<Object> postCustom(@RequestBody List<customDTO> customlist) {
+//@RequestParam(required = true) List<customDTO> customlist
+        ArrayList<Object> list = new ArrayList<Object>();
+
+        for (int i = 1; i <= 5; i++) {
+            Map<String, Object> member = new HashMap<>();
+            member.put("custId", i);
+            member.put("custName", "삼프로" + i);
+            member.put("phone", "010-5896-125" + i);
+            member.put("email", "global" + i + "@sampro.com");
             list.add(member);
         }
 

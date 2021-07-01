@@ -228,6 +228,52 @@
             }
             document.getElementById("txtVal").innerHTML = "select row : " + str;    
         }
+
+        function dataSend() {
+
+            var checkedItems = AUIGrid.getCheckedRowItems(myGridMst);
+            var arr = new Array();
+
+            var sendData = {};
+
+            arr[0] = checkedItems[0].item;
+
+            for(var i=0, len = checkedItems.length; i<len; i++) {
+                arr[i] = checkedItems[i].item;
+            }
+
+            //if (checkedItems.length > 0) {
+            //     sendData.add = checkedItems[0].item;
+            //}
+
+            alert(JSON.stringify(arr));
+
+            $.ajax({
+                url: "../../v1/grid/post/custom.do",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                cache: false,
+                dataType: "json",
+                data: JSON.stringify(arr),
+                success: function(data){
+
+                    alert(data);
+                    // 그리드에 데이터 세팅
+			        // data 는 JSON 을 파싱한 Array-Object 입니다.
+                    //AUIGrid.setGridData(objGridid, data);
+
+			        // 로더 제거
+			        //AUIGrid.removeAjaxLoader(objGridid);
+                },
+                error: function (request, status, error){
+                    
+                    alert("데이터 요청에 실패하였습니다.\r status : " + status);
+			        
+                    // 로더 제거
+			        AUIGrid.removeAjaxLoader(objGridid);
+                }
+            });            
+        }
     </script>    
 </head>
 <body>
@@ -239,6 +285,7 @@
             <button class="btn btn-primary" onclick="getdata()">data load</button>
             <button class="btn btn-primary" onclick="setColumnSize()">column size</button>
             <button class="btn btn-primary" onclick="codeTest()">aui function test</button>
+            <button class="btn btn-primary" onclick="dataSend()">data send</button>            
         </div>
 		<!-- 에이유아이 그리드가 이곳에 생성됩니다. -->
         <div class="row mb-4">
