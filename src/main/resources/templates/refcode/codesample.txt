@@ -298,3 +298,18 @@ var data = {
 // data 가 어떻게 만들어졌는지 확인해 보십시오.
 console.log(JSON.stringify(data));
 alert(JSON.stringify(data));
+
+자식창 > 부모창 값 넘기기
+https://sokkung.tistory.com/95
+
+<script type="text/javascript"> 
+// 자식창에서 부모창으로 값 전달 및 속성 변경 
+$("#hid_YN", opener.document).val("Y"); 
+$(opener.document).find("#hid_YN").val("Y"); 
+opener.document.getElementById("hid_YN").value="Y"; 
+parent.$("#hid_YN").val("Y"); 
+$("#hid_YN", opener.document).css("display","none"); //부모창 새로고침 
+opener.location.href = opener.document.URL; //부모창 함수 실행 
+opener.함수명(); </script>
+
+출처: https://ggmouse.tistory.com/233 [초보개발자꽁쥐]
