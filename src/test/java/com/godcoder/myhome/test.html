@@ -1,0 +1,22 @@
+		var data = new FormData();
+		data.append("file", _uploadFile[0]);
+		data.append("nSheetIdx", 0);
+		data.append("nStartRow", 1);		
+		data.append("nSheetCol", 0);	
+		data.append("listColNames", "test1,test2,test3");
+		
+		$.ajax({
+	       type: "POST",
+	       enctype: 'multipart/form-data',
+	       url: '/sdmng/commng/screengrpread/excelupload',
+	       data: data,
+	       processData: false, //prevent jQuery from automatically transforming the data into a query string
+	       contentType: false,
+	       cache: false,
+	       timeout: 600000,
+	       success: function (data) {
+			console.log("pass");
+	       },
+	       error: function (e) {
+	       }
+	    });		
