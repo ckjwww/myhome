@@ -1,0 +1,2335 @@
+/**
+ * cms 공통 모듈
+ * @module cmsUtil
+ */
+define(["exports","formUtil","ajaxUtil","comPopUpUtil","dateUtil","cmsDef","messageUtil","paho"],function (exports,formUtil,ajaxUtil,comPopUpUtil,dateUtil,cmsDef,messageUtil, paho) {
+
+	/**
+	 * cms 첨부파일 폴더구성 규칙
+	 *	1 level : 업무1레벨(cms)
+	 *	2 level : 사용, 폐기 (use, disuse)
+	 *	3 level : 업무2레벨(cn-소재관리,mb-메뉴보드,sd-편성관리)
+	 *	4 level : 년도(4자리)
+	 *	5 level : 월일(4자리)
+	 *	6 level : HTML 소재 만 해당	 
+	 */
+	
+	/** 함수정리
+	 * ========= INPUT TEXT 관련 함수 ===========
+	 * CTL_TEXT.setValue 		: 값 넣기
+	 * CTL_TEXT.getValue 		: 값 가져오기
+	 * CTL_TEXT.setValueIdx		: 값 넣기(복수개 동일이름구성일 경우)
+	 * CTL_TEXT.getValueIdx	 	: 값 가져오기(복수개 동일이름구성일 경우)
+	 * CTL_TEXT.maxLength		: 입력길이설정 
+	 * CTL_TEXT.maxLengthIdx	: 입력길이설정(복수개 동일이름구성일 경우)
+	 * CTL_TEXT.readOnly	 	: read only true / false
+	 * CTL_TEXT.readOnlyIdx	 	: read only true / false(복수개 동일이름구성일 경우)
+	 * CTL_TEXT.isReadOnly	 	: readonly 여부 (true / false)
+	 * CTL_TEXT.foucsIdx		: focus
+	 * CTL_TEXT.setAttrValue	: attribute 값넣기
+	 * CTL_TEXT.setAttrValueIdx	: attribute 값넣기(복수개 동일이름구성일 경우)
+	 * ========= SELECT OPTION 관련 함수 ===========
+	 * CTL_SELECT.setValue	 	: 값 넣기
+	 * CTL_SELECT.getValue		: 값 가져오기(코드)
+	 * CTL_SELECT.getText		: 값 가져오기(코드값)	 
+	 * CTL_SELECT.setValueIdx	: 값 넣기(복수개 동일이름구성일 경우)
+	 * CTL_SELECT.getValueIdx	: 값 가져오기(복수개 동일이름구성일 경우)
+	 * CTL_SELECT.readOnly	 	: read only true / false 	 
+	 * CTL_SELECT.readOnlyIdx 	: read only true / false(복수개 동일이름구성일 경우)	 
+	 * ========= RADIO 관련 함수 ===========
+	 * CTL_RADIO.setValue	 	: 값 넣기
+	 * CTL_RADIO.getValue		: 값 가져오기
+	 * CTL_RADIO.readOnly	 	: read only true / false	 
+	 * ========= CHECK BOX 관련 함수 ===========	 
+	 * CTL_CHECKBOX.getValue	: 값 가져오기
+	 * CTL_CHECKBOX.getValueIdx	: 값 가져오기(복수개 동일이름구성일 경우)
+	 * CTL_CHECKBOX.getValueGrp	: 모든값 가져오기(복수개 동일이름구성일 경우)	 
+	 * CTL_CHECKBOX.setValueGrp	: 모든값 설정하기(복수개 동일이름구성일 경우)	 
+	 * CTL_CHECKBOX.checked		: check or uncheck 
+	 * CTL_CHECKBOX.isChecked	: check 여부
+	 * CTL_CHECKBOX.isCheckedIdx: check 여부(복수개 동일이름구성일 경우)
+	 * CTL_CHECKBOX.readOnly	: read only true / false 	 
+	 * CTL_CHECKBOX.readOnlyIdx : 특정 idx read only true / false(복수개 동일이름구성일 경우)	 
+	 * CTL_CHECKBOX.readOnlyGrp : 모든 checkbox read only true / false(복수개 동일이름구성일 경우)	 
+	 * ========= BUTTON 관련 함수 ===========
+	 * CTL_BUTTON.readOnly	 	: read only true / false 	 
+	 * CTL_BUTTON.readOnlyIdx 	: read only true / false(복수개 동일이름구성일 경우)	
+	 * CTL_BUTTON.getDisabledIdx: Disable 값 가져오기(복수개 동일이름구성일 경우)
+	 * CTL_BUTTON.hideIdx		: 버튼 숨기기(복수개 동일이름구성일 경우)
+	 * ========= SELECT PICKER 관련 함수 ===========	 
+	 * CTL_SELECT_PICKER.getValue		: 값 가져오기
+	 * CTL_SELECT_PICKER.selectAll		: 전체 선택하기
+	 * CTL_SELECT_PICKER.refresh		: refresh
+	 * CTL_SELECT_PICKER.isSelectAll	: 전체 선택여부 
+	 * CTL_SELECT_PICKER.isYnSelectAll	: [사용여부 항목에 사용] 전체 선택여부
+	 * CTL_SELECT_PICKER.multiSetBind	: 멀티선택 SELECT PICKER 데이타바인딩	 
+	 * ========= 기타 관련 함수 ===========
+	 * CTL_ETC.addClass	 		: class 값 추가 	 
+	 * CTL_ETC.addClassIdx 		: class 값 추가(복수개 동일이름구성일 경우)
+	 * CTL_ETC.removeClass	 	: class 값 제거 	 
+	 * CTL_ETC.removeClassIdx 	: class 값 제거(복수개 동일이름구성일 경우)	 
+	 * ========= 공통코드 바인딩 관련 함수 ===========
+	 * setComCdToSelOptBind 		: 공통코드 select option 바인딩 설정
+	 * setRlSysMdCdToSelOptBind     : 매체코드 select option 바인딩 설정
+	 * ========= ajax 관련함수 ===========
+	 * rtnErrorMessage	: ajax 처리 후 실패일 경우 에러메세지 반환(controller에서 받아온 valid 메세지 리턴)
+	 * ========= string 관련함수 ===========	 
+	 * getByte : 바이트 가져오기(한글 2바이트)
+	 * ========= 공통코드 정제 관련함수 ===========
+	 * getDlbrtRrstCdLst : 소재진행상태코드에서 심의결과코드 만 가져오기
+	 * ========= Grid 관련함수 ===========
+	 * rtnGridComBoxListTemplateFunctionValue 	: 공통코드 그리드 콤보박스에 바인딩할 공통코드 list를 html 코드로 변환
+	 * rtnComBoxListTemplateFunctionValue 		: 공통코드 그리드 콤보박스 ListTemplateFunction return 값
+	 * isAddedById 		: 현재행이 추가된 행인지 확인
+	 * isRemovedById 	: 현재행이 삭제된 행인지 확인
+	 * getChangedList 	: 변경된 행 집합을 가져온다.
+	 * ========= FILE 파일다운로드 관련함수 ===========
+	 * FILE.upLoad 			: 화면에 한개의 컨트롤 이름 존재할 경우 파일업로드
+	 * FILE.upLoadIdx 		: 화면에 복수개의 컨트롤 이름 존재할 경우 파일업로드
+	 * FILE.upLoadVal 		: 업로드 파일 목록 리턴
+	 * FILE.upLoadView 		: 첨부파일번호, 순번 값으로 업로드 파일 확인
+	 * FILE.simpleUpload	: 파일업로드 리턴값 받기
+	 * FILE.simpleUploadV2	: 소재등록 특화 파일업로드
+	 * FILE.simpleUploadV3	: 소재등록 교체/수정 일 경우 사용
+	 * ========= POPUP 관련함수 ===========
+	 * POPUP.advrAuto	: 광고주 자동완성 팝업
+	 * POPUP.brandAuto	: 브랜드 자동완성 팝업
+	 * POPUP.advrForm	: 광고주 폼 팝업
+	 * POPUP.brandForm	: 브랜드 폼 팝업	 
+	 * ========= 타시스템 관련 함수 ===========	 
+	 * openCntrtReadScrn : 계약조회화면 열기
+	 * ========= 메뉴얼 selectpicker set 만들기 ===========
+	 * makeDataSetYn 		: Y/N 사용여부 set 만들기	 
+	 * makeDataSetWrkStat 	: vantage 작업상태 set 만들기	 
+	 * makeDataSetJobState 	: vantage Job State set 만들기	
+	 * ========= 기타 ===========	 
+	 * convertSecondToDdHhMmSs 	: 초 to 일시분초 변환 
+	 * sortObjArray				: Object Array 정렬
+	 * ========= Mqtt 관련함수 ===========	 
+	 * mqttPlayerNotagdRecvReq : 플레이어공지사항 수신 요청	  
+	 * mqttScreenEventRecvReq : 스크린 이벤트 수신 요청	  
+	 * mqttOohEventRecvReq : OOH 이벤트 수신 요청	  
+	 * mqttScreenRunchMaulWdtbReq : 스크린 운행표 수동 배포 요청	  
+	 * mqttOohRunchMaulWdtbReq : OOH 운행표 수동 배포 요청	  
+	 * mqttMatrMaulWdtbReq : 소재 수동 배포 요청
+	 * newPahoClient : mqtt연결	  
+	 */
+	
+	var baseUrl =  '/com/file/file-upload-popup';
+		
+	/** 
+	 * select option 박스 맨위 추가 문자 선택 타입
+	 */
+	var SELECT_OPTION_ADD_ITEM_TYPE = {
+		NONE   : "NONE",	//없음
+		SELECT : "SELECT",	//선택해주세요.
+		ALL    : "ALL"		//전체
+	}
+	exports.SELECT_OPTION_ADD_ITEM_TYPE = SELECT_OPTION_ADD_ITEM_TYPE;
+	
+	/**
+	 * 빈값 체크
+	 * 사용법 : if (_.isEmpty(value)) {};
+	 */
+	
+	/**
+	 * input text 관련 함수
+	 */ 
+	var CTL_TEXT = {
+		/**
+		 * set value
+		 * ctlId : [string]control id
+		 * inVal : value
+		 */
+		setValue : 	function (ctlId, inVal) {
+						$('#' + ctlId).val(inVal);
+					},
+	
+		/**
+		 * get value
+		 * ctlId : [string]control id
+		 */
+		getValue :	function (ctlId) {
+						return $('#' + ctlId).val();
+					},
+		
+		/**
+		 * Arrary 구성 input text box set value
+		 * ctlNm  : [string]control  name
+		 * arrIdx : [number]control index	 
+		 * inVal  : value
+		 */
+		setValueIdx : 	function (ctlNm, arrIdx, inVal) {
+							$('input[name=' + ctlNm + ']').eq(arrIdx).val(inVal);
+						},	
+		
+		/**
+		 * Arrary 구성 input text box get value
+		 * ctlNm  : [string]control  name
+		 * arrIdx : [number]control index	 
+		 */
+		getValueIdx : 	function (ctlNm, arrIdx) {
+							return $('input[name=' + ctlNm + ']').eq(arrIdx).val();
+						},	
+
+		/**
+		 * 입력길이 설정
+		 * ctlId  : [string]control id
+		 * length : [number]길이
+		 */
+		maxLength	:	function (ctlId, length) {
+							$('#' + ctlId).attr("maxlength", length);
+						},
+
+		/**
+		 * 복수개 동일이름구성일 경우 입력길이설정
+		 * ctlNm  : [string]control  name
+		 * arrIdx : control index
+		 * length : [number]길이
+		 */						
+		maxLengthIdx:	function (ctlNm, arrIdx, length) {
+							$('input[name=' + ctlNm + ']').eq(arrIdx).attr("maxlength", length);
+						},						
+
+		/**
+		 * readOnly 여부
+		 * ctlId : [string]control id
+		 */
+		isReadOnly	:	function (ctlId) {
+							var rtnVal = false;
+							
+							if ($('#' + ctlId).attr("readonly") == "readonly") {
+								rtnVal = true;
+							}
+							return rtnVal;			
+						},
+						
+		/**
+		 * read only
+		 * ctlId : [string]control id
+		 * inVal : [true/false]value (default : TRUE)
+		 */	
+		readOnly : 	function (ctlId, val) {
+			
+						if (val == undefined) {
+							val = true;
+						}
+
+						if (val) {
+							$("#" + ctlId).attr("readonly", val);
+						} else {
+							$("#" + ctlId).removeAttr("readonly");	
+						}
+				 	},
+				 	
+		/**
+		 * Index read only 
+		 * ctlNm 	: [string]control Name
+		 * arrIdx 	: [number]control index	 
+		 * inVal 	: [true/false]value (default : TRUE)
+		 */	
+		readOnlyIdx :	function (ctlNm, arrIdx, val) {
+
+							if (val == undefined) {
+								val = true;
+							}
+							
+							if (val) {
+								$('input[name=' + ctlNm + ']').eq(arrIdx).attr("readonly", val);
+							} else {
+								$('input[name=' + ctlNm + ']').eq(arrIdx).removeAttr("readonly");	
+							}							
+				 		},
+				 		
+		/**
+		 * Arrary 구성 input text box focus
+		 * ctlNm  : [string]control  name
+		 * arrIdx : [number]control index	 
+		 */
+		foucsIdx 	: 	function (ctlNm, arrIdx) {
+							$('input[name=' + ctlNm + ']').eq(arrIdx).focus();
+						},
+		
+		/**
+		 * input text box attribute set value
+		 * ctlId  : [string]control  name
+		 * attrNm : [string]attribute name		 
+		 * inVal  : value
+		 */		
+		setAttrValue	:	function (ctlId, attrNm, inVal) {
+								$('#' + ctlId).attr(attrNm, inVal);
+							},		
+		
+		/**
+		 * Arrary 구성 input text box attribute set value
+		 * ctlNm  : [string]control  name
+		 * arrIdx : [number]control index	 
+		 * attrNm : [string]attribute name		 
+		 * inVal  : value
+		 */		
+		setAttrValueIdx	:	function (ctlNm, arrIdx, attrNm, inVal) {
+								$('input[name=' + ctlNm + ']').eq(arrIdx).attr(attrNm, inVal);
+								//$('#' + ctlId).attr(attrNm, inVal);
+							}
+	}
+	exports.CTL_TEXT = CTL_TEXT;
+
+	/**
+	 * select option box 관련 함수
+	 */
+	var CTL_SELECT = {
+
+		/**
+		 * select option set value
+		 * ctlId : [string]control id
+		 * inVal : value
+		 */	
+		setValue : 	function (ctlId, inVal) {
+						$('#' + ctlId).val(inVal).prop('selected', true).change();
+					},				
+			
+		/**
+		 * select option get value
+		 * ctlId : [string]control id
+		 */	
+		getValue :	function (ctlId) {
+						return $('#' + ctlId + ' option:selected').val();
+					},
+					
+		/**
+		 * select option get text
+		 * ctlId : [string]control id
+		 */	
+		getText :	function (ctlId) {
+						return $('#' + ctlId + ' option:selected').text();
+					},					
+					
+		/**
+		 * Arrary 구성 select option set value
+		 * ctlNm  : [string]control Name
+		 * arrIdx : [number]control index	 
+		 * inVal  : value
+		 */	
+		setValueIdx : 	function (ctlNm, arrIdx, inVal) {
+							$('select[name=' + ctlNm + ']').eq(arrIdx).val(inVal).prop('selected', true).change();
+						},	
+		
+		/**
+		 * Arrary 구성 select option get value
+		 * ctlNm  : [string]control Name
+		 * arrIdx : [number]control index 
+		 */	
+		getValueIdx : 	function (ctlNm, arrIdx) {
+							return $('select[name=' + ctlNm + ']').eq(arrIdx).val();
+						},	
+
+		/**
+		 * read only
+		 * ctlId : [string]control id
+		 * inVal : [true/false]value (default : true)
+		 */		
+		readOnly : 	function (ctlId, val) {
+			
+						if (val == undefined) {
+							val = true;
+						}
+
+						$("#" + ctlId).prop('disabled', val);
+						$("#" + ctlId).selectpicker('refresh');
+					},
+					
+		/**
+		 * Arrary 구성 read only
+		 * ctlNm : [string]control id
+		 * inVal : [true/false]value (default : TRUE)
+		 */		
+		readOnlyIdx : 	function (ctlNm, arrIdx, val) {
+			
+							if (val == undefined) {
+								val = true;
+							}
+							
+							$('select[name=' + ctlNm + ']').eq(arrIdx).prop('disabled', val);
+							$('select[name=' + ctlNm + ']').eq(arrIdx).selectpicker('refresh');
+						}
+	}
+	exports.CTL_SELECT = CTL_SELECT;
+		
+	/**
+	 * RADIO 관련 함수
+	 */	
+	var CTL_RADIO = {
+		/**
+		 * set value
+		 * ctlNm : [string]control Name
+		 * inVal : value
+		 */	
+		setValue : 	function (ctlNm, inVal) {
+						$('input:radio[name=' + ctlNm + ']:input[value="' + inVal + '"]').prop("checked", true);
+					},
+		
+		/**
+		 * get value
+		 * ctlNm : [string]control Name
+		 */	
+		getValue : 	function (ctlNm) {
+						return $('input[name=' + ctlNm + ']:checked').val();
+					},
+					
+		/**
+		 * read only
+		 * ctlNm : [string]control Name
+		 * inVal : [true/false]value (default : TRUE)
+		 */		
+		readOnly : 	function (ctlNm, val) {
+			
+						if (val == undefined) {
+							val = true;
+						}
+						
+						$('input[name=' + ctlNm + ']').attr('disabled', val);
+					}					
+	}
+	exports.CTL_RADIO = CTL_RADIO;
+	
+	/**
+	 * CHECK BOX 관련 함수
+	 */
+	var CTL_CHECKBOX = {
+		/**
+		 * get value
+		 * ctlNm : [string]control Name
+		 */		
+		getValue : 	function (ctlNm) {
+						return  $('input:checkbox[name="' + ctlNm + '"]').val();
+					},
+					
+		/**
+		 * Arrary 구성 get value
+		 * ctlNm  : [string]control Name
+		 * arrIdx : [number]control index	 
+		 */		
+		getValueIdx : 	function (ctlNm, arrIdx) {
+							return $('input:checkbox[name="' + ctlNm + '"]').eq(arrIdx).val();
+						},
+						
+		/**
+		 * 선택된 체크 value 가져오기
+		 * ctlNm	: [string]control Name
+		 * separator: [string]구분자
+		 */						
+		getValueGrp:	function(ctlNm, separator) {
+							var getValue = '';
+							$('input[name=' + ctlNm + ']:checked').each(function(){
+								
+  								getValue += (_.isEmpty(getValue)?"":separator) + $(this).val();
+   							});
+   							return getValue;
+						},	
+
+		/**
+		 * 복수개 값 체크
+		 * ctlNm  	: [string]control Name
+		 * inVal	: value
+		 * separator: [string]구분자		
+		 * checkYn  : true / false
+		 */						
+		setValueGrp :	function(ctlNm, inVal, separator, checkYn) {
+							var arraryVal = inVal.split(separator);
+							
+							$("input[name="+ ctlNm +"]").prop("checked",false);
+							
+							for (var valIdx in arraryVal) {
+								
+								$("input[name="+ ctlNm +"][value="+arraryVal[valIdx]+"]").prop("checked",checkYn);
+							}			
+						},											
+		
+		/**
+		 * ctlId  	: [string]control Id
+		 * checkYn  : true / false		
+		 */
+		checked	: function (ctlId, checkYn) {
+						$('#' + ctlId).prop("checked",checkYn);			
+					  },
+
+						
+		/**
+		 * check 여부(return value : true/false) 
+		 * ctlId : [string]control ID
+		 */	
+		isChecked :	function (ctlId) {
+						return $("#" + ctlId).is(":checked");
+					},
+		
+		/**
+		 * Arrary 구성 check 여부(return value : true/false) 
+		 * ctlNm  : [string]control Name
+		 * arrIdx : [number]control index	 
+		 */	
+		isCheckedIdx : 	function (ctlNm, arrIdx) {
+							return $('input:checkbox[name="' + ctlNm + '"]').eq(arrIdx).is(":checked");
+						},	
+
+		/**
+		 * read only
+		 * ctlNm  	: [string]control Name
+		 * inVal 	: [true/false]value (default : TRUE)
+		 */		
+		readOnly :	function (ctlNm, val) {
+			
+							if (val == undefined) {
+								val = true;
+							}
+							$('input:checkbox[name="' + ctlNm + '"]').attr('disabled', val);
+						},
+						
+		/**
+		 * read only(복수개 동일이름구성일 경우)
+		 * ctlNm	: [string]control Name
+		 * arrIdx 	: [number]control index		 
+		 * inVal 	: [true/false]value (default : TRUE)
+		 */		
+		readOnlyIdx :	function (ctlNm, arrIdx, val) {
+			
+							if (val == undefined) {
+								val = true;
+							}
+							$('input:checkbox[name="' + ctlNm + '"]').eq(arrIdx).attr('disabled', val);
+						},	
+		
+		readOnlyGrp :	function (ctlNm, val) {
+
+							for (var loopCnt=0; loopCnt < $("input:checkbox[name=" + ctlNm + "]").length; loopCnt++) {
+								$('input:checkbox[name=' + ctlNm + ']').eq(loopCnt).attr('disabled', val);
+						}			
+		}
+	}
+	exports.CTL_CHECKBOX = CTL_CHECKBOX;	
+	
+	/**
+	 * button 관련 함수
+	 */
+	var CTL_BUTTON = {
+		
+		/**
+		 * read only
+		 * ctlId : [string]control id
+		 * inVal : [true/false]value (default : TRUE)
+		 */		
+		readOnly : 	function (ctlId, val) {
+			
+						if (val == undefined) {
+							val = true;
+						}
+						
+						$("#" + ctlId).attr('disabled', val);
+					},
+
+		/**
+		 * read only(복수개 동일이름구성일 경우)
+		 * ctlNm 	: [string]control Name
+		 * arrIdx 	: [number]control index		 
+		 * val 		: [true/false]value (default : TRUE)
+		 */		
+		readOnlyIdx :	function (ctlNm, arrIdx, val) {
+			
+							if (val == undefined) {
+								val = true;
+							}
+							$('button[name=' + ctlNm + ']').eq(arrIdx).attr('disabled', val);
+						},
+		
+		/**
+		 * disabled 값 가져오기(복수개 동일이름구성일 경우)
+		 * ctlNm 	: [string]control Name
+		 * arrIdx	: [number]control index
+		 */		
+		getDisabledIdx :	function (ctlNm, arrIdx) {
+			
+								return $('button[name=' + ctlNm + ']').eq(arrIdx).attr('disabled');
+							},
+						
+		/**
+		 * hideIdx 버튼 숨기기 (복수개 동일이름구성일 경우)
+		 * ctlNm 	: [string]control Name
+		 * arrIdx 	: [number]control index		 
+		 */		
+		hideIdx :	function (ctlNm, arrIdx) {
+						$('button[name=' + ctlNm + ']').eq(arrIdx).hide();
+					}						
+						
+	}
+	exports.CTL_BUTTON = CTL_BUTTON;
+
+	/**
+	 * SELECT PICKER 관련 함수
+	 */
+	var CTL_SELECT_PICKER = {
+
+		/**
+		 * get value
+		 * ctlId : [string]control id
+		 */
+		getValue	: 	function (ctlId) {
+							return $("#" + ctlId).selectpicker('val');		
+						},
+						
+		/**
+		 * setValue
+		 * ctlId : [string]control id
+		 * val(단일) 	 : [string]value
+		 * val(복수) 	 : [array]value		 
+		 * 호출 단일값 설정) cmsUtil.CTL_SELECT_PICKER.setValue('select id name', "M001");
+		 * 호출 복수값 설정) cmsUtil.CTL_SELECT_PICKER.setValue('select id name', ["M001", "M018"]);		 
+		 */						
+		setValue	: 	function (ctlId, val) {
+							$("#" + ctlId).selectpicker('val', val);		
+						},
+		
+		/**
+		 * 전체선택
+		 * ctlId : [string]control id
+		 */
+		selectAll	: 	function (ctlId) {
+							$("#" + ctlId).selectpicker('selectAll');			
+						},
+		
+		/**
+		 * refresh
+		 * ctlId : [string]control id		
+		 */
+		refresh		: 	function(ctlId) {
+							$("#" + ctlId).selectpicker('refresh');
+						},
+		
+		/**
+		 * 전체선택 여부
+		 * ctlId 	: [string]control id	
+		 * dataSet 	: [dataSet]데이타셋
+		 */						
+		isSelectAll	:	function (ctlId, dataSet) {
+							var rtnVal = false;
+							
+							if ($("#" + ctlId).selectpicker('val').length == dataSet.length) {
+								rtnVal = true;
+							}
+							
+							return rtnVal;
+						},					
+
+		/**
+		 * 사용여부 select picker일 경우 전체선택여부
+		 * ctlId : [string]control id		 
+		 */						
+		isYnSelectAll	:	function (ctlId) {
+								var rtnVal = false;
+								
+								if ($("#" + ctlId).selectpicker('val').length == 2) {
+									rtnVal = true;
+								}
+								
+								return rtnVal;
+							},
+		
+		/**
+		 * 멀티선택 SELECT PICKER 데이타바인딩
+		 * ctlId 		: [string]control id
+		 * dataSet 		: [Array]DATASET
+		 * cdFieldNm 	: [string]코드 필드명
+		 * cdNmFieldNm 	: [string]코드명 필드명
+		 */
+		multiSetBind	:	function(ctlId, dataSet, cdFieldNm, cdNmFieldNm) {
+								var cd = cdFieldNm;
+								var cdNm = cdNmFieldNm;
+								if (_.isEmpty(cdFieldNm)) {	
+									cd = "cd"; 
+								}
+								if (_.isEmpty(cdNmFieldNm)) {	
+									cdNm = "cdNm"; 
+								}								
+								var optionTag = formUtil.generateSelectOptions(dataSet, cdNm, cd,[]);
+				            	$("#" + ctlId).html(optionTag);
+				            	CTL_SELECT_PICKER.refresh(ctlId);			
+							}
+	}
+	exports.CTL_SELECT_PICKER = CTL_SELECT_PICKER;
+
+	var GRID = {
+		
+		/**
+		 * 추가 행 여부
+		 * auiGridId : GRID ID
+		 * return : true / false
+		 */
+		isAddedById : function (auiGridId) {
+							var rowIdField = AUIGrid.getProp(auiGridId, "rowIdField");
+							var selectedItems = AUIGrid.getSelectedRows(auiGridId)[0];
+							
+							return AUIGrid.isAddedById(auiGridId, selectedItems[rowIdField]);
+					  },
+
+		/**
+		 * 수정 행 여부
+		 * auiGridId : GRID ID
+		 * return : true / false
+		 */
+		isEditedById : function (auiGridId) {
+							var rowIdField = AUIGrid.getProp(auiGridId, "rowIdField");
+							var selectedItems = AUIGrid.getSelectedRows(auiGridId)[0];
+							
+							return AUIGrid.isEditedById(auiGridId, selectedItems[rowIdField]);
+					  },					  
+					  
+		/**
+		 * 삭제 행 여부
+		 * auiGridId : GRID ID
+		 * return : true / false
+		 */
+		isRemovedById : function (auiGridId) {
+							var rowIdField = AUIGrid.getProp(auiGridId, "rowIdField");
+							var selectedItems = AUIGrid.getSelectedRows(auiGridId)[0];
+							
+							return AUIGrid.isRemovedById(auiGridId, selectedItems[rowIdField]);
+					    },					  
+		/**
+		 * 그리드 변경 데이타 LIST 형태로 리턴
+		 * auiGridId : GRID ID
+		 */
+		getChangedList :	function getChangedList(auiGridId) {
+								const ret = [];
+								let rowItems = AUIGrid.getRemovedItems(auiGridId);
+								for (let deletedIdx in rowItems) {
+									rowItems[deletedIdx].crud = 'D';
+									ret.push(rowItems[deletedIdx]);
+								}
+						
+								rowItems = AUIGrid.getEditedRowItems(auiGridId);
+								for (let updatedIdx in rowItems) {
+									rowItems[updatedIdx].crud = 'U';
+									ret.push(rowItems[updatedIdx]);
+								}
+						
+								rowItems = AUIGrid.getAddedRowItems(auiGridId);
+								for (let insertedIdx in rowItems) {
+									rowItems[insertedIdx].crud = 'I';
+									ret.push(rowItems[insertedIdx]);
+								}
+								return ret;
+							},
+		/**
+		 * rowId 가져오기
+		 * auiGridId 	: GRID ID
+		 * rowIdx 		: row index 
+		 */	
+		getRowId : function (auiGridId, rowIdx) {
+						var item = AUIGrid.getItemByRowIndex(auiGridId, rowIdx);
+						var rowIdField = AUIGrid.getProp(auiGridId, "rowIdField");
+						var rowId = item[rowIdField]; // rowId 값 얻기	
+						
+						return rowId;					
+				   },
+		/**
+		 * 공통코드 그리드 콤보박스 LabelFunction return 값
+		 * comCdList : 공통코드 리스트 (gdsCode['CMS130'])
+		 * value : LabelFunction 의 value 파라미터
+		 */
+		rtnComBoxLabelFunctionValue :	function rtnComBoxLabelFunctionValue(comCdList, value) {
+											var retStr = "";
+											for(var i=0,len=comCdList.length; i<len; i++) {
+												if(comCdList[i]["cd"] == value) {
+													retStr = comCdList[i]["cdNm"];
+													break;
+												}
+											}
+											return retStr == "" ? value : retStr;		
+										},
+	
+		/**
+		 * 공통코드 그리드 콤보박스 ListTemplateFunction return 값
+		 * listItem : ListTemplateFunction 의 listItem 파라미터
+		 */
+		rtnComBoxListTemplateFunctionValue :	function rtnComBoxListTemplateFunctionValue(listItem) {
+													var html = '<div style="display:block;text-align:left;white-space:nowrap">';
+													for(var fVal in listItem) {
+														if (fVal != 'cdNm') {
+															continue;
+														}
+														html += '<span style="display:inline-block;width:80px;">' + listItem[fVal] + '</span>';
+													}
+													html += '</div>';	
+													
+													return html;	
+												}
+	}
+	exports.GRID = GRID;
+	
+	var CTL_ETC = {
+		
+			/**
+			 * class 값 추가
+			 * ctlId 	: [string]control id
+			 * classVal : [string]class value
+			 */
+			addClass : 	function (ctlId, classVal) {
+							$('#' + ctlId).addClass(classVal);
+						},
+			/**
+			 * class 값 추가(복수개 동일이름구성일 경우) -> label only (다른 컨트롤 할 상황이 생기면 그때 분리검토)
+			 * ctlNm 	: [string]control Name
+			 * classVal : [string]class value
+			 */
+			addClassIdx : 	function (ctlNm, arrIdx, classVal) {
+								$('label[name=' + ctlNm).eq(arrIdx).addClass(classVal);
+							},
+			/**
+			 * class 값 제거
+			 * ctlId 	: [string]control id
+			 * classVal : [string]class value
+			 */
+			removeClass : 	function (ctlId, classVal) {
+								$('#' + ctlId).removeClass(classVal);
+							},
+			/**
+			 * class 값 제거(복수개 동일이름구성일 경우) -> label only (다른 컨트롤 할 상황이 생기면 그때 분리검토)
+			 * ctlNm 	: [string]control Name
+			 * classVal : [string]class value
+			 */
+			removeClassIdx : 	function (ctlNm, arrIdx, classVal) {
+									$('label[name=' + ctlNm).eq(arrIdx).removeClass(classVal);
+								}												
+	
+	}
+	exports.CTL_ETC = CTL_ETC;	
+	
+	var FILE = {
+		
+		PRE_BIZ_TYPE 	: "cms.use",	//파일다운로드 bizType value
+		OPEN_TYPE 		: "default",	//파일다운로드 openType value			
+		
+		/**
+		 * 파일업로드
+		 */
+		upLoad		:	function (bizWrkType, ctlNmAtchFileNo, ctlNmAtchFileSeq, ctlNmAtchFileNm, openType) {
+							FILE.fileUpLoad (bizWrkType, ctlNmAtchFileNo, ctlNmAtchFileSeq, ctlNmAtchFileNm, undefined, openType);				
+						},
+		
+		/**
+		 * 파일업로드(복수개 동일이름구성일 경우)
+		 */
+		upLoadIdx	:	function (bizWrkType, ctlNmAtchFileNo, ctlNmAtchFileSeq, ctlNmAtchFileNm, idx, openType) {
+							FILE.fileUpLoad (bizWrkType, ctlNmAtchFileNo, ctlNmAtchFileSeq, ctlNmAtchFileNm, idx, openType);				
+						},
+		
+		/**
+		 * 파일업로드 리턴값 받기
+		 * bizWrkType	: 업무구분(cmsDef.BIZWRK 참고)
+		 * fileNo		: [숫자]파일번호
+		 * fileSeq		: [숫자]파일순번
+		 */
+		simpleUpload	:	function (bizWrkType, fileNo, fileSeq, callback) {
+			
+								var bizType = FILE.PRE_BIZ_TYPE + "." + bizWrkType;
+								
+								var fileParam = {
+								    bizType 		: bizType //**필수, 업무구분. 업로드 가능 확장자나 용량 제한
+								    , maxCnt 		: 1
+								    , atchFileNo 	: fileNo   
+								    , atchFileSeq 	: fileSeq
+								    , openType 		: "default" // default, readOnly(읽기전용), uploadOnly(업로드만 가능)
+								}
+								comPopUpUtil.fileUploadPopup(fileParam, function(returnData){
+									callback(returnData);
+								});			
+							},
+		
+		/**
+		 * 소재등록 특화 파일업로드
+		 * bizWrkType	: 업무구분(cmsDef.BIZWRK 참고)
+		 * $reqAttr		: [object]첨부파일 정보관리 속성명 3개(첨부파일번호, 첨부파일순번, 첨부파일명)
+		 * $reqVal		: [object]소재파일내역순번
+		 * idx			: [숫자]소재파일내역 등록 순번		
+		 */		
+		simpleUploadV2	:	function (bizWrkType, $reqAttr, $reqVal, idx) {
+
+								var contsFileSeq = $reqVal.contsFileSeq;
+								var fileNo = CTL_TEXT.getValueIdx($reqAttr.contsAtchFileNo, idx);
+								var fileSeq = CTL_TEXT.getValueIdx($reqAttr.contsAtchFileSeq, idx);
+			
+								var bizType = FILE.PRE_BIZ_TYPE + "." + bizWrkType;
+								var openType = !_.isEmpty(fileNo) && !_.isEmpty(contsFileSeq) ? "readOnly" : "default";
+								
+								var fileParam = {
+								    bizType 		: bizType //**필수, 업무구분. 업로드 가능 확장자나 용량 제한
+								    , maxCnt 		: 1
+								    , atchFileNo 	: fileNo   
+								    , atchFileSeq 	: fileSeq
+								    , openType 		: openType // default, readOnly(읽기전용), uploadOnly(업로드만 가능)
+								}
+								comPopUpUtil.fileUploadPopup(fileParam, function(rtnData){
+
+									if (!rtnData.isChange) {
+										return;
+									}
+									
+									var atchFileNo = rtnData.fileList[0].atchFileNo;
+									var atchFileSeq = rtnData.fileList[0].atchFileSeq;
+									var atchFileNm = rtnData.fileList[0].atchFileNm;
+
+									CTL_TEXT.setValueIdx($reqAttr.contsAtchFileNo, idx, atchFileNo);
+									CTL_TEXT.setValueIdx($reqAttr.contsAtchFileSeq, idx, atchFileSeq);
+									CTL_TEXT.setValueIdx($reqAttr.contsAtchFileNm, idx, atchFileNm);
+								});			
+							},
+
+		/**
+		 * 소재등록 교체/수정 일 경우 사용
+		 * bizWrkType	: 업무구분(cmsDef.BIZWRK 참고)
+		 * $reqAttr		: [object]첨부파일 정보관리 속성명 3개(첨부파일번호, 첨부파일순번, 첨부파일명)
+		 * idx			: [숫자]소재파일내역 등록 순번		
+		 */							
+		simpleUploadV3	:	function (bizWrkType, $reqAttr, idx) {
+
+								var fileNo = "";
+								var fileSeq = "";
+			
+								var bizType = FILE.PRE_BIZ_TYPE + "." + bizWrkType;
+								var openType = "default"
+								
+								var fileParam = {
+								    bizType 		: bizType //**필수, 업무구분. 업로드 가능 확장자나 용량 제한
+								    , maxCnt 		: 1
+								    , atchFileNo 	: fileNo   
+								    , atchFileSeq 	: fileSeq
+								    , openType 		: openType // default, readOnly(읽기전용), uploadOnly(업로드만 가능)
+								}
+								comPopUpUtil.fileUploadPopup(fileParam, function(rtnData){
+
+									if (!rtnData.isChange) {
+										return;
+									}
+									
+									var atchFileNo = rtnData.fileList[0].atchFileNo;
+									var atchFileSeq = rtnData.fileList[0].atchFileSeq;
+									var atchFileNm = rtnData.fileList[0].atchFileNm;
+
+									CTL_TEXT.setValueIdx($reqAttr.contsAtchFileNo, idx, atchFileNo);
+									CTL_TEXT.setValueIdx($reqAttr.contsAtchFileSeq, idx, atchFileSeq);
+									CTL_TEXT.setValueIdx($reqAttr.contsAtchFileNm, idx, atchFileNm);
+									
+									if ($reqAttr.rsoltnBt == undefined) {
+										return;
+									}
+									
+									CTL_TEXT.setValueIdx($reqAttr.rsoltnBt, idx, "");
+									CTL_TEXT.setValueIdx($reqAttr.rsoltnHeight, idx, "");
+									CTL_TEXT.setValueIdx($reqAttr.contsPlayngTms, idx, "");
+								});			
+							},							
+								
+		/**
+		 * 파일업로드
+		 * ctlNmAtchFileNo : atchFileNo 를 입력할 input control name
+		 * ctlNmAtchFileNm : atchFileNm 를 입력할 input control name
+		 * ctlNmAtchFileSeq : atchFileSeq 를 입력할 input control name
+		 * idx : 한화면에 복수개의 동일한 이름이 존재할 경우 인덱스
+		 * use sample : cmsUtil.FILE.fileUpLoad(cmsDef.BIZWRK.CN, 'contsAtchFileNo', 'contsAtchFileNm', 'contsAtchFileSeq', 1, cmsDef.FILE_OPEN_TYPE.READ_ONLY);
+		 */
+		fileUpLoad : function fileUpLoad (bizWrkType, ctlNmAtchFileNo, ctlNmAtchFileSeq, ctlNmAtchFileNm, idx, openType) {
+			
+			var bizType = FILE.PRE_BIZ_TYPE + "." + bizWrkType;
+			
+			var atchFileNo;
+			var atchFileSeq;
+			
+			if (idx == undefined) {
+				atchFileNo = CTL_TEXT.getValue(ctlNmAtchFileNo);
+				atchFileSeq = CTL_TEXT.getValue(ctlNmAtchFileSeq);
+			} else {
+				atchFileNo = CTL_TEXT.getValueIdx(ctlNmAtchFileNo, idx);
+				atchFileSeq = CTL_TEXT.getValueIdx(ctlNmAtchFileSeq, idx);				
+			}
+			
+			let fileParam = {
+			    bizType : bizType //**필수, 업무구분. 업로드 가능 확장자나 용량 제한
+			    , maxCnt 		: 1
+			    , atchFileNo 	: atchFileNo   // 파라매터로 넘길 파일번호
+			    , atchFileSeq 	: atchFileSeq
+			    , openType : _.isEmpty(openType) ? FILE.OPEN_TYPE : openType // default, readOnly(읽기전용), uploadOnly(업로드만 가능)
+			}
+			comPopUpUtil.fileUploadPopup(fileParam, function(returnData){
+				
+				if (returnData.fileList.length == 0) {
+					return;
+				}
+				if (idx == undefined) {
+					
+					CTL_TEXT.setValue(ctlNmAtchFileNo, returnData.fileList[0].atchFileNo);
+				    CTL_TEXT.setValue(ctlNmAtchFileNm, returnData.fileList[0].atchFileNm);
+				    CTL_TEXT.setValue(ctlNmAtchFileSeq, returnData.fileList[0].atchFileSeq);
+				} else {
+					
+					CTL_TEXT.setValueIdx(ctlNmAtchFileNo, idx, returnData.fileList[0].atchFileNo);
+				    CTL_TEXT.setValueIdx(ctlNmAtchFileNm, idx, returnData.fileList[0].atchFileNm);
+				    CTL_TEXT.setValueIdx(ctlNmAtchFileSeq, idx, returnData.fileList[0].atchFileSeq);	
+				}
+				
+				if (!_.isEmpty(atchFileNo) && returnData.isChange) {
+					messageUtil.showMessage("신규파일로 변경되었습니다.");	
+				}
+			});
+		},
+				   
+		/**
+		 * 파일업로드 후 업로드 파일 목록 리턴
+		 * AtchFileNo : atchFileNo value
+		 * use sample 1 : cmsUtil.FILE.downLoad(cmsDef.BIZWRK.CN, 125, callback);		 
+		 * use sample 2 : cmsUtil.FILE.downLoad(cmsDef.BIZWRK.CN, 125, callback, cmsDef.FILE_OPEN_TYPE.READ_ONLY);
+		 */				   
+		upLoadVal : function (bizWrkType, atchFileNoVal, callback, openType) {
+
+						var bizType = FILE.PRE_BIZ_TYPE + "." + bizWrkType;
+						
+						let fileParam = {
+						    bizType : bizType //**필수, 업무구분. 업로드 가능 확장자나 용량 제한
+						    , atchFileNo : atchFileNoVal   // 파라매터로 넘길 파일번호
+						    , openType : _.isEmpty(openType) ? FILE.OPEN_TYPE : openType // default, readOnly(읽기전용), uploadOnly(업로드만 가능)
+						}
+						comPopUpUtil.fileUploadPopup(fileParam, function(returnData){
+							
+							callback(returnData.fileList);
+						});
+				   	},
+
+		/**
+		 * upload 파일 뷰어
+		 * atchFileNoVal	: 첨부파일번호
+		 * atchFileSeqVal	: 첨부파일순번 
+		 */
+		upLoadView	: function (atchFileNoVal, atchFileSeqVal) {
+			let fileParam = {
+			    bizType 		: FILE.PRE_BIZ_TYPE //readonly 일경우 의미 없음.  **필수, 업무구분. 업로드 가능 확장자나 용량 제한
+			    , maxCnt 		: 1
+			    , atchFileNo 	: atchFileNoVal   // 파라매터로 넘길 파일번호
+			    , atchFileSeq 	: atchFileSeqVal
+			    , openType 		: "readOnly" // default, readOnly(읽기전용), uploadOnly(업로드만 가능)
+			}
+			comPopUpUtil.fileUploadPopup(fileParam);
+		}				   			   
+	}
+	exports.FILE = FILE;
+	
+	var POPUP = {
+		/**
+		 * 광고주 자동완성기능
+		 * $objAdvrNo 	: [object]광고주번호 input id
+		 * $objAdvrNm 	: [object]광고주명 input id
+		 * mode			: [true/false]선택모드
+		 * 사용방법		: cmsUtil.POPUP.advrAuto($("#advrNo"), $("#advrNm"), false);
+		 */
+		advrAuto	:	function ($objAdvrNo, $objAdvrNm, mode) {
+							let multiMode = mode;
+							let popParam = {
+								advrNoNm : $objAdvrNo.val(),
+								multimode :multiMode
+							}
+							let popOpt = {		// 사용될 오브젝트, 컬럼 리스트, 코드 필드 등 팝업 옵션
+								objCode : $objAdvrNo
+								, objName : $objAdvrNm
+								, popupType : "GET"	// GET 방식 선 조회
+							}
+							comPopUpUtil.admngPopup(popParam, function (returnData){
+								if(multiMode){
+									let arrSelectedVal = []; //Array to store your multiple value in stack
+									let arrSelectedTxt = []; //Array to store your multiple value in stack
+									returnData.forEach(function(data){
+										arrSelectedVal.push(data.advrNo); //Stack the value
+										arrSelectedTxt.push(data.advrNm);
+									});
+									$objAdvrNo.val(arrSelectedVal);
+									$objAdvrNm.val(arrSelectedTxt);
+								}else{
+									$objAdvrNo.val(returnData.advrNo);
+									$objAdvrNm.val(returnData.advrNm);
+								}
+							}, popOpt);			
+						},
+		/**
+		 * 광고주 자동완성기능
+		 * $objAdvrNo 	: [object]광고주번호 input id
+		 * $objAdvrNm 	: [object]광고주명 input id
+		 * mode			: [true/false]선택모드
+		 * 사용방법		: cmsUtil.POPUP.advrAuto($("#advrNo"), $("#advrNm"), false);
+		 */
+		advrForm	:	function ($objAdvrNo, $objAdvrNm, mode, callback) {
+							
+							var reqAdvrNo = $objAdvrNo.val();	//광고주번호
+							var isChange = false;
+							
+							var multmode = mode;
+							var popParam = {
+								'advrNoNm'	: $objAdvrNo.val(),
+								'multimode' : multmode
+							}
+							comPopUpUtil.admngPopup(popParam, function (returnData){
+								var advrNo;
+								var advrNm;
+								if(multmode){
+									var arrSelectedVal = []; //Array to store your multiple value in stack
+									var arrSelectedTxt = []; //Array to store your multiple value in stack
+									returnData.forEach(function(data){
+										arrSelectedVal.push(data.advrNo); //Stack the value
+										arrSelectedTxt.push(data.advrNm);
+									});
+									
+									advrNo = arrSelectedVal;
+									advrNm = arrSelectedTxt;
+								}else{
+									advrNo = returnData.advrNo;
+									advrNm = returnData.advrNm;
+								}
+								$objAdvrNo.val(advrNo);
+								$objAdvrNm.val(advrNm);
+								
+								if (reqAdvrNo != advrNo) {
+									isChange = true;	
+								}
+								callback(isChange);
+							})		
+						},						
+		/**
+		 * 브랜드 자동완성기능
+		 * $objBrandNo 	: [object]브랜드번호 input id
+		 * $objBrandNm 	: [object]브랜드명 input id
+		 * $objAdvrNo 	: [object]광고주번호 input id		 
+		 * mode			: [true/false]선택모드
+		 * 사용방법		: cmsUtil.POPUP.brandAuto($("#brandNo"), $("#brandNm"), $("#advrNo"), false);
+		 */
+		brandAuto	: 	function ($objBrandNo, $objBrandNm, $objAdvrNo, mode) {
+
+							var advrNo = "";
+							if ($objAdvrNo != undefined && !_.isEmpty($objAdvrNo)) {
+								
+								var chkVal = $objAdvrNo.val().split(',');
+								
+								if (chkVal.length == 1) {
+									advrNo = $objAdvrNo.val();
+								}
+							}
+			
+							let multiMode = mode;
+							let popParam = {
+								brandNoNm	: $objBrandNo.val(),
+								advrNo 		: advrNo,
+								multimode 	: multiMode
+							}
+							let popOpt = {		// 사용될 오브젝트, 컬럼 리스트, 코드 필드 등 팝업 옵션
+								objCode : $objBrandNo
+								, objName : $objBrandNm
+								, popupType : "GET"	// GET 방식 선 조회
+							}
+							comPopUpUtil.brandPopup(popParam, function (returnData){
+								if(multiMode){
+									let arrSelectedVal = []; //Array to store your multiple value in stack
+									let arrSelectedTxt = []; //Array to store your multiple value in stack
+									returnData.forEach(function(data){
+										arrSelectedVal.push(data.brandNo); //Stack the value
+										arrSelectedTxt.push(data.brandNm);
+									});
+									$objBrandNo.val(arrSelectedVal);
+									$objBrandNm.val(arrSelectedTxt);
+								}else{
+									$objBrandNo.val(returnData.brandNo);
+									$objBrandNm.val(returnData.brandNm);
+								}
+							}, popOpt);	
+						},
+		/**
+		 * 브랜드 폼 띄우기
+		 * $objBrandNo 	: [object]브랜드번호 input id
+		 * $objBrandNm 	: [object]브랜드명 input id
+		 * $objAdvrNo 	: [object]광고주번호 input id		 
+		 * mode			: [true/false]선택모드
+		 * 사용방법		: cmsUtil.POPUP.brandForm($("#brandNo"), $("#brandNm"), $("#advrNo"), false);
+		 */						
+		brandForm	: 	function ($objBrandNo, $objBrandNm, $objAdvrNo, mode) {
+							
+							var advrNo = "";
+							if ($objAdvrNo != undefined && !_.isEmpty($objAdvrNo)) {
+								
+								var chkVal = $objAdvrNo.val().split(',');
+								
+								if (chkVal.length == 1) {
+									advrNo = $objAdvrNo.val();
+								}
+							}
+							
+							let multmode = mode;
+							let popParam = {
+								'brandNoNm' : $objBrandNo.val(),
+								'advrNo'	: advrNo,
+								'multimode' : multmode
+							}
+							comPopUpUtil.brandPopup(popParam, function (returnData){
+								var brandNo;
+								var brandNm;
+								if(multmode){
+									let arrSelectedVal = []; //Array to store your multiple value in stack
+									let arrSelectedTxt = []; //Array to store your multiple value in stack
+									returnData.forEach(function(data){
+										arrSelectedVal.push(data.brandNo); //Stack the value
+										arrSelectedTxt.push(data.brandNm);
+									});
+									brandNo = arrSelectedVal;
+									brandNm = arrSelectedTxt;
+								}else{
+									brandNo = returnData.brandNo;
+									brandNm = returnData.brandNm;
+								}
+								$objBrandNo.val(brandNo);
+								$objBrandNm.val(brandNm);
+							})							
+						}			
+	}
+	exports.POPUP = POPUP;
+	
+	/**
+	 * 공통코드 select option 바인딩 설정
+	 * ctlId : [type:string]공통코드를 바인딩 할 coltrol id
+	 * grpCd : [type:string]공통 그룹코드(ex. CMS110, CMS120)	
+	 * topAddType : SELECT_IPTION_ADD_ITEM_TYPE (default = SELECT_OPTION_ADD_ITEM_TYPE.SELECT)
+	 */
+	function setComCdToSelOptBind(ctlId, grpCd, defVal, topAddType) {
+		setSelOptBind("COM", ctlId, grpCd,"", -1, defVal, topAddType);
+	}
+	exports.setComCdToSelOptBind = setComCdToSelOptBind;
+	
+	/**
+	 * 매체코드 select option 바인딩 설정
+	 * ctlId : [type:string]공통코드를 바인딩 할 coltrol id
+	 * grpCd : [type:string]공통 그룹코드(ex. CMS110, CMS120)	
+	 * topAddType : SELECT_IPTION_ADD_ITEM_TYPE (default = SELECT_OPTION_ADD_ITEM_TYPE.SELECT)
+	 */
+	function setRlSysMdCdToSelOptBind(ctlId, defVal, topAddType) {
+		setSelOptBind("RL_SYS_MD_CD", ctlId, "","", -1, defVal, topAddType);
+	}
+	exports.setRlSysMdCdToSelOptBind = setRlSysMdCdToSelOptBind;	
+	
+	/**
+	 * 공통코드를 select option 바인딩 설정
+	 * callType   : url type
+	 * ctlId      : [type:string]공통코드를 바인딩 할 coltrol id
+	 * grpCd      : [type:string]공통 그룹코드(ex. CMS110, CMS120)	
+	 * arrIdx     : control index
+	 * topAddType : SELECT_IPTION_ADD_ITEM_TYPE (default = SELECT_OPTION_ADD_ITEM_TYPE.SELECT)
+	 */	
+	function setSelOptBind(callType, ctlId, grpCd, ref, arrIdx, defVal, topAddType) {
+		
+		if (_.isEmpty(topAddType)) {
+			topAddType = SELECT_OPTION_ADD_ITEM_TYPE.SELECT;
+		}
+		
+		var callUrl = "";
+		var codeDto = null;
+		switch (callType) {
+			case "COM":				//공통코드
+				callUrl = "/code-management/code-detail";
+				codeDto = {
+					"grpCd" : grpCd
+				  , "cd"    : ""
+				  , "useYn" : "Y"
+				};				
+				break;
+			case "COM_REF":			//공통코드 REF
+				callUrl = "/cms-common/code-detail/" + grpCd + "/D";
+				break;	
+			case "COM_REF2":		//공통코드 REF1, REF2
+				callUrl = "/cms-common/code-detail/" + grpCd + "/D/" + ref ;
+				break;					
+			case "RL_SYS_MD_CD":	//연관시스템 매체 코드
+				callUrl = "/cms-common/rlsys-mdtl";
+				break;				
+		}; 		
+		
+
+		var ajaxParam = {
+			"url" : callUrl
+		  ,	"data": codeDto
+		};
+		ajaxUtil.getJSON(ajaxParam)
+				.then((data)=>{
+					if(data.hasOwnProperty("result")){
+
+						var optionTag = formUtil.generateSelectOptions(data["result"],"cdNm","cd",null);
+						
+						var addStr = "";
+						switch (topAddType) {
+							case SELECT_OPTION_ADD_ITEM_TYPE.NONE: 
+								break;
+							case SELECT_OPTION_ADD_ITEM_TYPE.SELECT:
+								addStr = "선택해주세요.";
+								break;
+							case SELECT_OPTION_ADD_ITEM_TYPE.ALL:
+								addStr = "전체";
+								break;
+						}
+						
+						if (!_.isEmpty(addStr)){
+							optionTag = '<option value="" data-ref1Val="null"  data-ref10Val="null" >' + addStr + '</option>' + optionTag;
+						}
+						
+						if (arrIdx == -1) {
+        					$("#" + ctlId).html(optionTag);
+        					$("#" + ctlId).selectpicker('refresh');
+        					if (!_.isEmpty(defVal)) {
+								CTL_SELECT.setValue(ctlId, defVal);
+							}
+        				} else {
+							$('select[name='+ctlId+']').eq(arrIdx).html(optionTag);
+							$('select[name='+ctlId+']').eq(arrIdx).selectpicker('refresh');
+        					if (!_.isEmpty(defVal)) {
+								CTL_SELECT.setValueIdx(ctlId, arrIdx, defVal);
+							}							
+						}	
+					}
+				});		
+	}
+	
+	/**
+	 * Arrary 구성 SelectPicker 공통코드 바인딩
+	 * ctlId 		: 컨트롤 id 
+	 * arrIdx 		: 컨트롤 arrary
+	 * grpCdData 	: 바인딩데이타
+	 * defVal		: default value
+	 * topAddType	: 최상단 값
+	 */
+	function setArrarySelectPicker(ctlId, arrIdx, grpCdData, defVal, topAddType) {
+		
+		if (_.isEmpty(topAddType)) {
+			topAddType = SELECT_OPTION_ADD_ITEM_TYPE.SELECT;
+		}
+
+		var optionTag = formUtil.generateSelectOptions(grpCdData,"cdNm","cd",null);
+		
+		var addStr = "";
+		switch (topAddType) {
+			case SELECT_OPTION_ADD_ITEM_TYPE.NONE: 
+				break;
+			case SELECT_OPTION_ADD_ITEM_TYPE.SELECT:
+				break;
+			case SELECT_OPTION_ADD_ITEM_TYPE.ALL:
+				addStr = "전체";
+				break;
+		}
+		
+		if (!_.isEmpty(addStr)){
+			optionTag = '<option value="" data-ref1Val="null"  data-ref10Val="null" >' + addStr + '</option>' + optionTag;
+		}
+		
+		$('select[name='+ctlId+']').eq(arrIdx).html(optionTag);
+		$('select[name='+ctlId+']').eq(arrIdx).selectpicker('refresh');
+		if (!_.isEmpty(defVal)) {
+			CTL_SELECT.setValueIdx(ctlId, arrIdx, defVal);
+		}	
+	}	
+	exports.setArrarySelectPicker = setArrarySelectPicker;
+	
+	/**
+	 * ajax 처리 후 실패일 경우 에러메세지 반환 (controller에서 받아온 valid 메세지 리턴)
+	 */
+	function rtnErrorMessage(jqXHR) {
+		
+		var rtnMessage="";
+		
+		if (_.isEmpty(jqXHR)) {
+			return rtnMessage;	
+		}
+		
+		var errMsg = [];
+		var idx = 0;
+		if (jqXHR.responseJSON.errors.length > 0) {
+			jqXHR.responseJSON.errors.forEach(function(errors){
+				errMsg[idx] = '- ' + errors.reason;
+				idx += 1;
+			});				
+			
+			rtnMessage = errMsg.join('<br>');
+		} else {
+			rtnMessage = jqXHR.responseText;
+		}
+		return rtnMessage;		
+	}	
+	exports.rtnErrorMessage = rtnErrorMessage;	
+	
+	
+	/**
+	 * 바이트 가져오기(한글 2바이트)
+	 * reqVal : string
+	 */
+	function getByte(reqVal) {
+
+		var byte = 0;
+
+		for (var loopCnt=0; loopCnt<reqVal.length; ++loopCnt) {
+			// 기본 한글 2바이트 처리
+			if (reqVal.charCodeAt(loopCnt) > 127) {
+				byte = byte + 2;
+			} else {
+				byte++;
+			}
+		}
+		return byte;
+	}
+	exports.getByte = getByte;	
+	
+	/**
+	 * CMS110 에서 심의결과코드 정보만 LIST로 반환
+	 * reqVal : List
+	 * return value : List
+	 */
+	function getDlbrtRrstCdLst(reqVal) {
+		
+		var rtnVal = _.filter(reqVal, 
+						function(value){
+							return value.cd=='204'||value.cd=='206'?true:false
+						}
+					);
+					 
+		return rtnVal;			 
+	}	
+	exports.getDlbrtRrstCdLst = getDlbrtRrstCdLst;	
+	
+	/**
+	 * ref1Val ,ref2Val 필터
+	 * reqVal : List
+	 * return value : List
+	 */	
+	function getComCdFilter(reqVal,ref1Val,ref2Val) {
+	
+	var rtnVal = _.filter(reqVal, 
+					function(value){
+						if (ref2Val != undefined){ 
+							return value.ref1Val== ref1Val && value.ref2Val==ref2Val ?true:false
+						}else{
+							return value.ref1Val==ref1Val ?true:false
+						}
+					}
+				);
+	return rtnVal;			
+	}
+	exports.getComCdFilter = getComCdFilter;
+	
+	/******  공통파일 업로드 관련 fun */	
+	
+	// 파일 다운로드
+	function fileDownload(atcFNo, atcFSeq){
+			if(_.isEmpty(atcFNo) || _.isEmpty(atcFSeq) ) {
+				messageUtil.showMessage("파일정보를 확인해 주세요.")
+				return false;
+			}
+			
+			let ajaxParam = new URLSearchParams({
+				atchFileSeq : atcFSeq
+				, atchFileNo : atcFNo
+			}); 
+			
+			let url = baseUrl + '/download?' + ajaxParam.toString()
+	
+			excuteGetFileAjax(url,0)
+		}
+	exports.fileDownload = fileDownload;
+	
+	// AJAX 통신을 통해 파일을 다운로드한다.
+	function excuteGetFileAjax(serviceUrl,excuteCnt){
+			 var withCredential=false;
+	
+			var originCheckTag = document.createElement("a");
+			originCheckTag.href=serviceUrl;
+			var ajaxOrigin=location.protocol+"//"+originCheckTag.host;
+			
+			if(location.origin!=ajaxOrigin){
+				withCredential=true;
+			}
+	
+			var ajaxOrigin=location.origin;
+			$.ajax({
+				url: serviceUrl,
+				type : 'GET',
+				xhrFields: { 
+					responseType: 'blob'
+				},
+				contentType: 'charset=utf-8',
+				beforeSend : function() {  //ajax 호출전 progress 초기화
+					ajaxUtil.openLoadingImage();
+				},
+				success : function(data, textStatus, jqXHR) {
+					try {
+						if(data.size>0){
+							var fileName=decodeURIComponent(getFileName(jqXHR.getResponseHeader("content-disposition")));
+							if(window.navigator.msSaveOrOpenBlob) {
+								window.navigator.msSaveOrOpenBlob(data, fileName);
+							}else{
+								var link = document.createElement('a'); 
+								link.href = window.URL.createObjectURL(data); 
+							  	link.download = fileName;
+								link.click();
+								window.URL.revokeObjectURL(link.href);
+							}
+						}else{
+							messageUtil.showMessage("파일이 존재하지 않습니다.");
+						}
+					} catch(e){
+						messageUtil.showMessage("파일 다운로드 중 문제가 발생하였습니다.");
+					} finally{
+						ajaxUtil.closeLoadingImage();
+					}
+					
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					ajaxUtil.closeLoadingImage();
+					if(jqXHR.status == '0'){
+						messageUtil.showMessage("네트워크 상태가 불안정합니다.\n잠시 후 다시 시도해 주세요.");
+					}else if(jqXHR.status == '401'){
+						tabWin.parent.postMessage({type:"SESSION_TIMEOUT"},"*");
+						return false;
+					}else{
+						messageUtil.showMessage("파일 다운로드 중 문제가 발생하였습니다.");
+					}
+				}
+	
+			});
+		}
+	
+	// 파일명 가져오기
+	function getFileName (contentDisposition) {
+			if(!contentDisposition){
+				return "";
+			}
+			var fileName = contentDisposition
+				.split(';')
+				.filter(function(ele) {
+					return ele.indexOf('filename') > -1
+				})
+				.map(function(ele) {
+					return ele
+						.replace(/"/g, '')
+						.split("=UTF-8''")[1]
+				});
+			return fileName[0] ? fileName[0] : "";
+		}
+	
+	/**
+	 * user id 암호화키 가져오기
+	 */	
+	function getUserIdEncrptKey(callback) {
+		var ajaxParam = {
+			  "url"  : "/cms-common/selectuseridencryptkey"
+		};
+		
+		ajaxUtil.getJSON(ajaxParam)
+				.then((data)=>{
+					
+					if(data.hasOwnProperty("result")){
+						callback(data["result"].userIdEncrypt);
+					}
+				});			
+	}
+	exports.getUserIdEncrptKey = getUserIdEncrptKey;	
+	
+	/**
+	 * 계약조회화면 열기
+	 */
+	function openCntrtReadScrn(useridEncryptKey, cntrtNo) {
+		
+		var cntrtReadUrl = cmsDef.getCallerUrl(cmsDef.URL_KIND.CNTRT_READ);
+		
+		var param = new Object();
+		param["CNTRT_NO"] = cntrtNo;
+		
+		var form = document.createElement("form");
+		form.setAttribute("target", "_blank");
+		form.setAttribute("action", cntrtReadUrl); //계약조회화면 URL
+		form.setAttribute("enctype", "application/json");
+		form.setAttribute("method", "GET");
+		
+		var hiddenField = document.createElement("input");
+		hiddenField.setAttribute("type", "hidden");
+		hiddenField.setAttribute("name", "userId");
+		hiddenField.setAttribute("value", useridEncryptKey);
+		form.appendChild(hiddenField);
+
+		hiddenField = document.createElement("input");
+		hiddenField.setAttribute("type", "hidden");
+		hiddenField.setAttribute("name", "targetId");
+		hiddenField.setAttribute("value", cmsDef.INTLK_PROGRAM_ID.CNTRT_READ);
+		form.appendChild(hiddenField);
+		
+		hiddenField = document.createElement("input");
+		hiddenField.setAttribute("type", "hidden");
+		hiddenField.setAttribute("name", "params");
+		hiddenField.setAttribute("value", JSON.stringify(param));
+		form.appendChild(hiddenField);					
+		
+		document.body.appendChild(form);
+		form.submit();			
+	}
+	exports.openCntrtReadScrn = openCntrtReadScrn;
+	
+	/**
+	 * 시간 set 생성
+	 * kind : [string]HH : 시간, MM : 분
+	 */
+	function makeTimeSet(kind) {
+		var tempData = new Object();
+		var resSet = [];
+		var sIdx = 0;
+		var eIdx = 0;
+		var addStr = "";
+		var inVal = "";
+		
+		switch(kind.toUpperCase()) {
+		case "HH":
+			sIdx = 0;
+			eIdx = 23;		
+			break;
+		case "MM":
+			sIdx = 0;
+			eIdx = 59;		
+			break;	
+		default:
+			return resSet;
+		}
+		
+		for (var loopCnt = sIdx; loopCnt <= eIdx; loopCnt++) {
+			
+			addStr = "0".repeat(2-String(loopCnt).length);
+			inVal = addStr + String(loopCnt);
+			
+			tempData = new Object();
+			tempData["cd"] = inVal;
+			tempData["cdNm"] = inVal;
+			resSet.push(tempData);						
+		}
+		
+		return resSet;			
+	}
+	exports.makeTimeSet = makeTimeSet;
+		
+	/**
+	 * Y/N 사용여부 dataset 만들기
+	 */
+	function makeDataSetYn() {
+		var ynData = new Object();
+		var resYn = [];
+		
+		ynData["cd"] = cmsDef.YN.Y;
+		ynData["cdNm"] = cmsDef.YN.Y;
+		resYn.push(ynData);
+		
+		ynData = new Object();
+		ynData["cd"] = cmsDef.YN.N;
+		ynData["cdNm"] = cmsDef.YN.N;
+		resYn.push(ynData);
+		
+		return resYn;
+	}
+	exports.makeDataSetYn = makeDataSetYn;
+	
+	/**
+	 * vantage 작업상태 dataset 만들기
+	 */
+	function makeDataSetWrkStat() {
+		var wrkStat = new Object();
+		var resVal = [];
+		
+		wrkStat["cd"] = "All";
+		wrkStat["cdNm"] = "전체";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "Active";
+		wrkStat["cdNm"] = "작업중";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "Failed";
+		wrkStat["cdNm"] = "실퍠";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "Paused";
+		wrkStat["cdNm"] = "중지";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "Complete";
+		wrkStat["cdNm"] = "작업완료";
+		resVal.push(wrkStat);		
+		
+		return resVal;
+	}
+	exports.makeDataSetWrkStat = makeDataSetWrkStat;	
+	
+	/**
+	 * vantage Job State dataset 만들기
+	 */
+	function makeDataSetJobState() {
+		var wrkStat = new Object();
+		var resVal = [];
+		
+		wrkStat["cd"] = "0";
+		wrkStat["cdNm"] = "In Process";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "4";
+		wrkStat["cdNm"] = "Failed";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "5";
+		wrkStat["cdNm"] = "Complete";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "6";
+		wrkStat["cdNm"] = "Waiting";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "7";
+		wrkStat["cdNm"] = "Stopped by User";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "8";
+		wrkStat["cdNm"] = "Waiting to Retry";
+		resVal.push(wrkStat);
+		
+		return resVal;
+	}
+	exports.makeDataSetJobState = makeDataSetJobState;
+	
+	/**
+	 * vantage Action State dataset 만들기
+	 */
+	function makeDataSetActionState() {
+		var wrkStat = new Object();
+		var resVal = [];
+		
+		wrkStat["cd"] = "0";
+		wrkStat["cdNm"] = "In Process";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "1";
+		wrkStat["cdNm"] = "Ignored";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "2";
+		wrkStat["cdNm"] = "Complete";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "3";
+		wrkStat["cdNm"] = "Failed";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "4";
+		wrkStat["cdNm"] = "Waiting";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "5";
+		wrkStat["cdNm"] = "Created";
+		resVal.push(wrkStat);
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "6";
+		wrkStat["cdNm"] = "Paused";
+		resVal.push(wrkStat);		
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "9";
+		wrkStat["cdNm"] = "Stopped By User";
+		resVal.push(wrkStat);		
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "10";
+		wrkStat["cdNm"] = "Waiting to Retry";
+		resVal.push(wrkStat);		
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "12";
+		wrkStat["cdNm"] = "Waiting on Service";
+		resVal.push(wrkStat);		
+		
+		wrkStat = new Object();
+		wrkStat["cd"] = "13";
+		wrkStat["cdNm"] = "Waiting on Run On Rule";
+		resVal.push(wrkStat);		
+		
+		return resVal;
+	}
+	exports.makeDataSetActionState = makeDataSetActionState;	
+	
+	/**
+	 * 초 to 일시분초 변경 
+	 * reqVal : [숫자]초
+	 */
+	function convertSecondToDdHhMmSs(reqVal) {
+		
+		//var reqVal = (11*60*60*24) + (25*3600) + (2*60) + (181); //2147483647;
+		var daySecond = 60*60*24;
+		var hourSecond = 60*60;
+		var minuteSecode = 60;
+		var reqTimeDd = 0;
+		var reqTimeDdRe = 0;
+		var reqTimeHh = 0;
+		var reqTimeHhRe = 0;
+		var reqTimeMm = 0;
+		var reqTimeMmRe = 0;
+		var reqTimeSs = 0;
+
+		reqTimeDd = (reqVal > daySecond) ? parseInt(reqVal / daySecond) : 0;
+		reqTimeDdRe = reqTimeDd > 0 ? reqVal - (reqTimeDd * daySecond) : 0;
+		reqTimeHh = reqTimeDd > 0 
+					   ? parseInt(reqTimeDdRe / hourSecond) 
+					   : (reqVal > 0 ? parseInt(reqVal / hourSecond) : 0
+					  );
+		reqTimeHhRe = (reqTimeDd > 0 || reqTimeHh > 0)  
+						 ? reqVal - (reqTimeDd * daySecond) - (reqTimeHh * hourSecond) 
+						 : (reqVal > hourSecond ? parseInt(reqVal / hourSecond) : 0
+						);
+		reqTimeMm = (reqTimeDd > 0 || reqTimeHh > 0) 
+						? parseInt(reqTimeHhRe / minuteSecode) 
+						: (reqVal > 0 ? parseInt(reqVal / minuteSecode) : 0
+					  );
+		reqTimeMmRe = reqTimeMm > 0 
+						 ? reqVal - (reqTimeDd * daySecond) - (reqTimeHh * hourSecond) - (reqTimeMm * minuteSecode) 
+						 : 0;
+		reqTimeSs = (reqTimeDd > 0 || reqTimeHh > 0 || reqTimeMm > 0) ? reqTimeMmRe : reqVal	
+		
+		var resVal = new Object();
+		resVal["day"] = reqTimeDd;
+		resVal["hour"] = reqTimeHh;
+		resVal["minute"] = reqTimeMm;
+		resVal["second"] = reqTimeSs;
+		return resVal
+	}
+	exports.convertSecondToDdHhMmSs = convertSecondToDdHhMmSs;
+	
+	/**
+	 * Object Array 정렬
+	 * $objArrary 	: [object]Object array
+	 * fieldNm 		: [string]정렬대상 필드명
+	 * order		: [string]정렬 (ASC - 오름차순, DESC - 내림차순)
+	 */
+	function sortObjArray($objArrary, fieldNm, order) {
+		switch (order.toUpperCase()) {
+		case "ASC":
+			$objArrary.sort(function (f, s){
+				return f[fieldNm] < s[fieldNm] ? -1 : f[fieldNm] > s[fieldNm] ? 1 : 0;
+			});
+			break;
+		case "DESC":
+			$objArrary.sort(function (f, s){
+				return f[fieldNm] > s[fieldNm] ? -1 : f[fieldNm] < s[fieldNm] ? 1 : 0;
+			});
+			break;		
+		}
+	}
+	exports.sortObjArray = sortObjArray;
+	
+	//=======================================================
+	//= mqtt 요청
+	//=======================================================		
+	const hostname = cmsDef.URL.MQTT_SVR;
+	const mqttPort = cmsDef.getCallerPort(cmsDef.URL_KIND.MQTT);
+
+	/**
+	 * mqtt 요청 전송
+	 */			
+	function newPahoClient() {
+		client = new paho.Client(hostname, Number(mqttPort), "");
+		return client;
+	}
+	exports.newPahoClient = newPahoClient;		
+		
+	/**
+	 * mqtt 요청 전송
+	 */			
+	function mqttReqSend(client, paramLst, sendFunc, cb) {
+		
+		//mqtt 커넥션 
+		client.onConnectionLost = onConnectionLost; // set callback handlers
+		client.onMessageArrived = onMessageArrived;
+		client.sendFunc = sendFunc;
+		client.cb = cb;
+		if(!client.isConnected()) {
+			try {				
+				//ssl 변경 후 추가 코드		
+				let hosts = [hostname];
+				let portNo = Number(cmsDef.getCallerPort(cmsDef.URL_KIND.MQTT));
+				let ports = [portNo];
+				client.connect({ onSuccess: onConnect ,useSSL : true, hosts : hosts, ports:ports}); // connect the client
+			} catch (error) {
+				console.log(error);
+			}				
+		}		
+		else {
+			onSubscribe();	// 이미 연결되어 있는경우는 subscribe만 수행				
+		}
+				
+		/**
+		 * mqtt 접속
+		*/					
+		function onConnect() {
+			console.log("onConnect");
+			onSubscribe();										
+		}
+		
+		/**
+		 * mqtt subscribe
+		*/	
+		function onSubscribe() {
+			
+			let topics = [];
+			paramLst.forEach(item=>{				
+				let topic_item = new Object();
+				topic_item = item.topic;
+				topics.push(topic_item);			
+			});		
+			client.subscribe(topics); // 여러개의 topic을 subscribe
+			sendFunc(client, paramLst);						
+		}		
+		
+		/**
+		 * mqtt 접속 실패 상세내용
+		 */		
+		function onConnectionLost(responseObject) {
+			if (responseObject.errorCode !== 0) {
+				console.log("onConnectionLost:" + responseObject.errorMessage);
+			}
+		}
+		/**
+		 * message 받기
+		 */			
+		function onMessageArrived(message) {
+			let strMsg = decodeURIComponent(JSON.stringify(message.payloadString));
+			try {
+				strMsg = JSON.parse(strMsg);
+				//messageUtil.showMessage("전송 되었습니다.").then(function(){
+					console.log({
+						onMessageArrived : strMsg,
+						msgDate : new Date()
+					});
+				//});
+				client.cb(true);
+			} catch (error) {
+				//messageUtil.showMessage("전송 실패 하었습니다.").then(function(){
+					console.log(error);
+				//});
+				client.cb(false);				
+			}
+		}			
+	}	
+	
+	/**
+	 * mqtt message 보내기
+	 */				
+	function mqttSendMessage(client, cmd, topic) {
+		let msg;
+		try {
+			$.parseJSON(cmd);
+			msg = cmd;
+		} catch {
+			msg = encodeURIComponent(cmd);
+		}
+		let message = new paho.Message(msg);
+		message.destinationName = topic;
+		client.send(message);
+	}	
+	exports.mqttSendMessage = mqttSendMessage;		
+	
+	/**
+	 * 플레이어공지사항 수신 요청
+	 */			
+	function mqttPlayerNotagdRecvReq(client, paramLst) {
+		mqttReqSend(client, paramLst, sendPlayerNotagdRecvReq, function(result) {
+			console.log(result);	
+		});		
+		messageUtil.showMessage("요청하였습니다.");
+		
+		// 요청 전송 
+		function sendPlayerNotagdRecvReq(client, paramLst) {
+			paramLst.forEach(item=>{	
+				let topic = item.topic;
+				let playerNoMultiVal = item.playerNoMultiVal;
+				let params = item.params;			
+							
+				if(!_.isEmpty(topic) && !_.isEmpty(playerNoMultiVal)){
+				
+					let param = {};
+					const programId = "IF-CMS-007-Q";
+					const optUrl = "/sdmng/commng/cmsplayermqttif/playernotagdrecvreq-bas"; 
+					
+					param["playerNoMultiVal"] = playerNoMultiVal;
+					param["programId"] = programId;
+			
+					//플레이어 인터페이스 ID생성 및 인터페이스 테이블 저장
+					let options = {
+						"url": optUrl
+						,"data": JSON.stringify(param)
+					};
+					ajaxUtil.post(options).then((data)=>{
+						if("ok" === data["code"]){
+							let ifId = data["result"];
+							let obj = {
+								ifId : ifId,
+								programId : programId,
+								playerNo : playerNoMultiVal,
+								params : ""
+							};
+							try {
+								mqttSendMessage(client, JSON.stringify(obj), topic);
+							} catch {
+								console.log('mqttSendMessage Err');
+							}					
+						}
+					});			
+				}											
+			});							
+		}			
+	}	 			
+	exports.mqttPlayerNotagdRecvReq = mqttPlayerNotagdRecvReq;
+	
+	/**
+	 * 스크린이벤트 수신 요청
+	 */			
+	function mqttScreenEventRecvReq(client, paramLst) {
+		mqttReqSend(client, paramLst, sendScreenEventRecvReq, function(result) {
+			console.log(result);	
+		});		
+		messageUtil.showMessage("요청하였습니다.");
+		
+		// 요청 전송 
+		function sendScreenEventRecvReq(client, paramLst) {
+			paramLst.forEach(item=>{	
+				let topic = item.topic;
+				let playerNoMultiVal = item.playerNoMultiVal;
+				let params = item.params;			
+							
+				if(!_.isEmpty(topic) && !_.isEmpty(playerNoMultiVal)){
+			
+					let param = {};
+					const programId = "IF-CMS-014-Q";
+					const optUrl = "/sdmng/commng/cmsplayermqttif/screeneventrecvreq-bas"; 
+		
+					param["playerNoMultiVal"] = playerNoMultiVal;
+					param["programId"] = programId;
+			
+					//플레이어 인터페이스 ID생성 및 인터페이스 테이블 저장
+					let options = {
+						"url": optUrl
+						,"data": JSON.stringify(param)
+					};
+					ajaxUtil.post(options).then((data)=>{
+						if("ok" === data["code"]){
+							let ifId = data["result"];
+							let obj = {
+								ifId : ifId,
+								programId : programId,
+								playerNo : playerNoMultiVal,
+								params : ""
+							};
+							mqttSendMessage(client, JSON.stringify(obj), topic);
+						}
+					});			
+				}												
+			});							
+		}			
+	}	 			
+	exports.mqttScreenEventRecvReq = mqttScreenEventRecvReq;				
+	
+	/**
+	 * OOH이벤트 수신 요청
+	 */			
+	function mqttOohEventRecvReq(client, paramLst) {
+		mqttReqSend(client, paramLst, sendOohEventRecvReq, function(result) {
+			console.log(result);	
+		});		
+		messageUtil.showMessage("요청하였습니다.");
+		
+		// 요청 전송 
+		function sendOohEventRecvReq(client, paramLst) {
+			paramLst.forEach(item=>{	
+				let topic = item.topic;
+				let playerNoMultiVal = item.playerNoMultiVal;
+				let params = item.params;			
+							
+				if(!_.isEmpty(topic) && !_.isEmpty(playerNoMultiVal)){
+					let param = {};
+					const programId = "IF-CMS-015-Q";
+					const optUrl = "/sdmng/commng/cmsplayermqttif/ooheventrecvreq-bas";
+					
+					param["playerNoMultiVal"] = playerNoMultiVal;
+					param["programId"] = programId;
+			
+					//플레이어 인터페이스 ID생성 및 인터페이스 테이블 저장
+					let options = {
+						"url": optUrl
+						,"data": JSON.stringify(param)
+					};
+					ajaxUtil.post(options).then((data)=>{
+						if("ok" === data["code"]){
+							let ifId = data["result"];
+							let obj = {
+								ifId : ifId,
+								programId : programId,
+								playerNo : playerNoMultiVal,
+								params : ""
+							};
+							mqttSendMessage(client, JSON.stringify(obj), topic);
+						}
+					});			
+				}												
+			});							
+		}				
+	}	 			
+	exports.mqttOohEventRecvReq = mqttOohEventRecvReq;
+	
+	/**
+	 * 스크린 운행표 수동배포 요청
+	 */			
+	function mqttScreenRunchMaulWdtbReq(client, paramLst) {
+		mqttReqSend(client, paramLst, sendScreenRunchMaulWdtbReq, function(result) {
+			console.log(result);	
+		});		
+		messageUtil.showMessage("요청하였습니다.");
+		
+		// 요청 전송 
+		function sendScreenRunchMaulWdtbReq(client, paramLst) {
+			paramLst.forEach(item=>{	
+				let topic = item.topic;
+				let playerNoMultiVal = item.playerNoMultiVal;
+				let params = item.params;			
+							
+				if(!_.isEmpty(topic) && !_.isEmpty(playerNoMultiVal) && !_.isEmpty(params)){
+			
+					let param = {};
+					const programId = "IF-CMS-011-Q";
+					const optUrl = "/sdmng/commng/cmsplayermqttif/screenrunchmaulwdtbreq-bas"; 
+		
+					param["playerNoMultiVal"] = playerNoMultiVal;
+					param["programId"] = programId;
+					param["params"] = params;
+			
+					//플레이어 인터페이스 ID생성 및 인터페이스 테이블 저장
+					let options = {
+						"url": optUrl
+						,"data": JSON.stringify(param)
+					};
+					ajaxUtil.post(options).then((data)=>{
+						if("ok" === data["code"]){
+							let ifId = data["result"];
+							let obj = {
+								ifId : ifId,
+								programId : programId,
+								playerNo : playerNoMultiVal,
+								params : params
+							};
+							mqttSendMessage(client, JSON.stringify(obj), topic);
+						}
+					});			
+				}														
+			});							
+		}		
+	}	 			
+	exports.mqttScreenRunchMaulWdtbReq = mqttScreenRunchMaulWdtbReq;		
+	
+	/**
+	 * OOH 운행표 수동배포 요청
+	 */			
+	function mqttOohRunchMaulWdtbReq(client, paramLst) {
+		let successCnt = 0;		
+		let failCnt = 0;						
+		mqttReqSend(client, paramLst, sendOohRunchMaulWdtbReq, function(result) {
+			//console.log(result);
+			if(!result) {
+				failCnt++;		
+			} else 		
+				successCnt++;			
+		});		
+		
+		setTimeout(function() {
+			console.log('fail='+failCnt+', success='+successCnt);
+/*			if(failCnt > 0) {
+				messageUtil.showMessage("전송 실패 하었습니다.");				
+				return false;
+			}
+			
+			if(successCnt == paramLst.length) {
+				messageUtil.showMessage("전송 성공 하었습니다.");
+				return true;
+			}	*/
+			messageUtil.showMessage("요청하였습니다.");
+		}, 0);	
+
+		function sendOohRunchMaulWdtbReq(client, paramLst) {
+			paramLst.forEach(item=>{	
+				let topic = item.topic;
+				let playerNoMultiVal = item.playerNoMultiVal;
+				let params = item.params;									
+	
+				if(!_.isEmpty(topic) && !_.isEmpty(playerNoMultiVal) && !_.isEmpty(params)){
+			
+					let param = {};
+					const programId = "IF-CMS-016-Q";
+					const optUrl = "/sdmng/commng/cmsplayermqttif/oohrunchmaulwdtbreq-bas"; 
+		
+					param["playerNoMultiVal"] = playerNoMultiVal;
+					param["programId"] = programId;
+					param["params"] = params;			
+			
+					//플레이어 인터페이스 ID생성 및 인터페이스 테이블 저장
+					let options = {
+						"url": optUrl
+						,"data": JSON.stringify(param)
+					};
+					ajaxUtil.post(options).then((data)=>{
+						if("ok" === data["code"]){
+							let ifId = data["result"];
+							let obj = {
+								ifId : ifId,
+								programId : programId,
+								playerNo : playerNoMultiVal,
+								params : params
+							};
+							mqttSendMessage(client, JSON.stringify(obj), topic);
+						}
+					});			
+				}	
+			});							
+		}						
+		
+	}	 			
+	exports.mqttOohRunchMaulWdtbReq = mqttOohRunchMaulWdtbReq;
+				
+	
+	/**
+	 * 소재 수동배포 요청
+	 */			
+	function mqttMatrMaulWdtbReq(client, paramLst) {
+		mqttReqSend(client, paramLst, sendMatrMaulWdtbReq, function(result) {
+			console.log(result);	
+		});		
+		messageUtil.showMessage("요청하였습니다.");
+		
+		// 요청 전송 
+		function sendMatrMaulWdtbReq(client, paramLst) {
+			paramLst.forEach(item=>{	
+				let topic = item.topic;
+				let playerNoMultiVal = item.playerNoMultiVal;
+				let params = item.params;			
+							
+				if(!_.isEmpty(topic) && !_.isEmpty(playerNoMultiVal) && !_.isEmpty(params)){
+			
+					let param = {};
+					const programId = "IF-CMS-012-Q";
+					const optUrl = "/sdmng/commng/cmsplayermqttif/matrmaulwdtbreq-bas"; 
+		
+					param["playerNoMultiVal"] = playerNoMultiVal;
+					param["programId"] = programId;
+					param["params"] = params;			
+			
+					//플레이어 인터페이스 ID생성 및 인터페이스 테이블 저장
+					let options = {
+						"url": optUrl
+						,"data": JSON.stringify(param)
+					};
+					ajaxUtil.post(options).then((data)=>{
+						if("ok" === data["code"]){
+							let ifId = data["result"];
+							let obj = {
+								ifId : ifId,
+								programId : programId,
+								playerNo : playerNoMultiVal,
+								params : params
+							};
+							mqttSendMessage(client, JSON.stringify(obj), topic);
+						}
+					});			
+				}														
+			});							
+		}				
+	}	 			
+	exports.mqttMatrMaulWdtbReq = mqttMatrMaulWdtbReq;
+	
+	/**
+	 * documentElement to Json
+	 * xml : [object]documentElement
+	 */
+	function xmlToJson(xml) {
+		var resJson = {};
+		
+		if (xml.children.length == 0) {
+			resJson = xml.textContent;
+			return resJson;
+		}
+		
+		for (var loopCnt = 0; loopCnt < xml.children.length; loopCnt++) {
+			var item = xml.children.item(loopCnt);
+			var nodeName = item.nodeName;
+			
+			if (typeof(resJson[nodeName]) == "undefined") {
+				resJson[nodeName] = xmlToJson(item);
+			} else {
+				if (typeof(resJson[nodeName].push) == "undefined") {
+					var old = resJson[nodeName];
+					resJson[nodeName] = [];
+					resJson[nodeName].push(old);
+				}
+				resJson[nodeName].push(xmlToJson(item));
+			}
+		}
+		return resJson;
+	}	
+	exports.xmlToJson = xmlToJson;
+	
+	/**
+	 * 개발중
+	 */
+	var CTL = {
+
+		getTagName : function (ctlId) {
+						return $("#" + ctlId).prop("tagName");
+					 },		
+		/**
+		 * get value
+		 * ctlId : [string]control id
+		 */
+		getValue :	function (ctlId) {
+			
+						var tagname = CTL.getTagName(ctlId);
+						var rtnVal = "";
+						
+						if (tagname == undefined) { return "undefined"; }
+						
+						switch (tagname) {
+						case "INPUT":
+							rtnVal = $('#' + ctlId).val();
+							break;
+						case "SELECT":
+							rtnVal = $('#' + ctlId + ' option:selected').val();
+							break;							
+						default:
+							return "not support";
+						}
+						return rtnVal;
+					}
+	}
+	exports.CTL = CTL;	
+});
